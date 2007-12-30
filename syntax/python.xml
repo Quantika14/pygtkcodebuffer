@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+
+<Grammar>
+    <KeywordList style="keyword">
+        <Keyword>if</Keyword>
+        <Keyword>else</Keyword>
+        <Keyword>elif</Keyword>
+        <Keyword>and</Keyword>
+        <Keyword>or</Keyword>
+        <Keyword>not</Keyword>
+        <Keyword>in</Keyword>
+        <Keyword>return</Keyword>
+        <Keyword>pass</Keyword>
+        <Keyword>raise</Keyword>
+        <Keyword>import</Keyword>
+        <Keyword>from</Keyword>
+    </KeywordList>
+
+    <KeywordList>
+        <Keyword>def</Keyword>
+        <Keyword>class</Keyword>
+    </KeywordList>
+    
+    <KeywordList style="number">
+        <Keyword>True</Keyword>
+        <Keyword>False</Keyword>
+    </KeywordList>
+    
+    <KeywordList style="special">
+        <Keyword>self</Keyword>
+    </KeywordList>
+    
+    <Pattern style="comment">#.*$</Pattern>
+    <Pattern style="string">".*?"</Pattern>
+    <Pattern style="string">'.*?'</Pattern>
+    <Pattern style="string" flags="S">""".*?"""</Pattern>
+    <Pattern style="string" flags="S">'''.*?'''</Pattern>
+    <Pattern style="number" group="1">\W(\d+(?:\.\d+|\.\d+e[\-]?\d+)?)\W</Pattern>
+</Grammar>
