@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
-<Grammar>
-    <KeywordList style="keyword">
+<Syntax>
+    <KeywordList>
         <Keyword>if</Keyword>
         <Keyword>else</Keyword>
         <Keyword>elif</Keyword>
@@ -31,9 +31,26 @@
     </KeywordList>
     
     <Pattern style="comment">#.*$</Pattern>
-    <Pattern style="string">".*?"</Pattern>
-    <Pattern style="string">'.*?'</Pattern>
-    <Pattern style="string" flags="S">""".*?"""</Pattern>
-    <Pattern style="string" flags="S">'''.*?'''</Pattern>
     <Pattern style="number" group="1">\W(\d+(?:\.\d+|\.\d+e[\-]?\d+)?)\W</Pattern>
-</Grammar>
+    
+    <String escape="\">
+        <Starts>"""</Starts>
+        <Ends>"""</Ends>
+    </String>
+    
+    <String escape="\">
+        <Starts>'''</Starts>
+        <Ends>'''</Ends>
+    </String>
+    
+    <String escape="\">
+        <Starts>"</Starts>
+        <Ends>"</Ends>
+    </String>
+    
+    <String escape="\">
+        <Starts>'</Starts>
+        <Ends>'</Ends>
+    </String>
+    
+</Syntax>

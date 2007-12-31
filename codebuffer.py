@@ -60,10 +60,10 @@ class Pattern:
     """ More or less internal used class representing a pattern. """
 
     def __init__(self, regexp, style="DEFAULT", group=0, flags=""):
-        if DEBUG_FLAG: 
-            print "init rule %s -> %s"%(regexp, style)
         # assemble re-flag
         flags += "ML"; flag   = 0
+        if DEBUG_FLAG: 
+            print "init rule %s -> %s (%s)"%(regexp, style, flags)
         for char in flags:
             if char == 'M': flag |= re.M
             if char == 'L': flag |= re.L
@@ -77,14 +77,13 @@ class Pattern:
         self.tag_name = style
         
         
-    def __call__(self, buf, start, end=None):
-        if not end: end = buf.get_end_iter()
-        
-        txt = buf.get_text(start, end, False)
+    def __call__(self, txt, start, end):
         m = self._regexp.search(txt)
+        if DEBUG_FLAG:
+            print "Search for %s at %s..."%(self._regexp.pattern, start.get_offset())
         if not m: return None
         if DEBUG_FLAG:
-            print "found \"%s\" (%s)"%(m.group(self._group), self.tag_name)
+            print "... found \"%s\" (%s)"%(m.group(self._group), self.tag_name)
         
         mstart, mend = m.start(self._group), m.end(self._group)
         s = start.copy(); s.forward_chars(mstart)
@@ -100,9 +99,33 @@ class KeywordList(Pattern):
         regexp = "(?:\W|^)(%s)\W"%("|".join(keywords),)
         Pattern.__init__(self, regexp, style, group=1, flags="")
         
+        
+        
     
+class String:
+    def __init__(self, starts, ends, escape="\\", style="string"):
+        self._starts  = re.compile(starts)
+        self._ends    = re.compile(ends)
+        self.tag_name = style
 
-    
+
+    def __call__(self, txt, start, end):
+        start_match = self._starts.search(txt)
+        if not start_match: return
+        
+        start_it = start.copy()
+        start_it.forward_chars(start_match.start(0))
+        end_it   = end.copy()
+        
+        end_match = self._ends.search(txt, start_match.end(0))
+        if end_match:
+            end_it.set_offset(start.get_offset()+end_match.end(0))            
+            
+        return  start_it, end_it
+        
+        
+        
+        
 class LanguageDefinition:
     def __init__(self, rules):
         self._grammar = rules
@@ -111,13 +134,17 @@ class LanguageDefinition:
         # if no end given -> end of buffer
         if not end: end = buf.get_end_iter()
     
+        if DEBUG_FLAG:
+            print "Apply lang-rules at %s..."%(start.get_offset())
+            
         mstart = mend = end
         mtag   = None
-            
+        txt = buf.get_slice(start, end)    
+        
         # search min match
         for rule in self._grammar:
             # search pattern
-            m = rule(buf, start, end)            
+            m = rule(txt, start, end)            
             if not m: continue
             
             # prefer match with smallest start-iter 
@@ -218,6 +245,30 @@ class SyntaxLoader(ContentHandler, LanguageDefinition):
         self.__keywords.append(unescape(txt))
 
 
+    #handle String-definitions
+    def startString(self, attr):
+        self.__style = "string"
+        self.__escape = attr['escape']
+        if 'style' in attr.keys():
+            self.__style = attr['style']
+        self.__start_pattern = None
+        self.__end_pattern = None
+
+    def endString(self):
+        strdef = String(self.__start_pattern, self.__end_pattern,
+                        self.__escape, self.__style)
+        self._grammar.append(strdef)
+        del self.__style
+        del self.__escape
+        del self.__start_pattern
+        del self.__end_pattern
+        
+    def charsStarts(self, txt):
+        self.__start_pattern = unescape(txt)
+        
+    def charsEnds(self, txt):
+        self.__end_pattern = unescape(txt)
+
 
 
 
@@ -248,11 +299,11 @@ class CodeBuffer(gtk.TextBuffer):
         # if no syntax defined -> nop
         if not self._lang_def: return False
         
-        deftag = self.get_tag_table().lookup("DEFAULT")
-        it.backward_to_tag_toggle(deftag)
-        if it.ends_tag(deftag):
-            it.backward_to_tag_toggle(deftag)
-            
+        it.backward_chars(length)
+        tags = it.get_tags()
+        if len(tags)>0:
+            it.backward_to_tag_toggle(tags[0])
+                
         self.update_syntax(it)        
         
         
@@ -260,10 +311,9 @@ class CodeBuffer(gtk.TextBuffer):
         # if no syntax defined -> nop
         if not self._lang_def: return False
         
-        deftag = self.get_tag_table().lookup("DEFAULT")
-        start.backward_to_tag_toggle(deftag)
-        if start.ends_tag(deftag):
-            start.backward_to_tag_toggle(deftag)
+        tags = start.get_tags()
+        if len(tags)>0:
+            start.backward_to_tag_toggle(tags[0])
         
         self.update_syntax(start)        
         
@@ -277,10 +327,10 @@ class CodeBuffer(gtk.TextBuffer):
         
         # optimisation: if mstart-mend is allready tagged with tagname 
         #   -> finished
-        #if tagname:     #if something found
-        #    tag = self.get_tag_table().lookup(tagname)
-        #    if mstart.begins_tag(tag) and mend.ends_tag(tag):
-        #        return
+        if tagname:     #if something found
+            tag = self.get_tag_table().lookup(tagname)
+            if mstart.begins_tag(tag) and mend.ends_tag(tag):
+                return
                 
         # remove all tags from start..mend (mend == buffer-end if no match)        
         self.remove_all_tags(start, mend)
