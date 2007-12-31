@@ -26,5 +26,6 @@ setup ( name = 'PyGTKCodeBuffer',
 
         py_modules = ['gtkcodebuffer'],
         
-        data_files = [('share/pygtkcodebuffer/syntax',   ['syntax/python.xml'])]
+        data_files = [('share/pygtkcodebuffer/syntax',   
+                        ['syntax/python.xml', 'syntax/cpp.xml'])]
       )                

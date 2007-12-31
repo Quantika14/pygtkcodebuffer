@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+
+<Syntax>
+    <KeywordList>
+        <Keyword>and</Keyword>
+        <Keyword>and_eq</Keyword>
+        <Keyword>asm</Keyword>
+        <Keyword>bitand</Keyword>
+        <Keyword>bitor</Keyword>
+        <Keyword>case</Keyword>
+        <Keyword>catch</Keyword>
+        <Keyword>compl</Keyword>
+        <Keyword>const_cast</Keyword>
+        <Keyword>continue</Keyword>
+        <Keyword>default</Keyword>
+        <Keyword>delete</Keyword>
+        <Keyword>do</Keyword>
+        <Keyword>dynamic_cast</Keyword>
+        <Keyword>else</Keyword>
+        <Keyword>for</Keyword>
+        <Keyword>fortran</Keyword>
+        <Keyword>friend</Keyword>
+        <Keyword>goto</Keyword>
+        <Keyword>if</Keyword>
+        <Keyword>new</Keyword>
+        <Keyword>not</Keyword>
+        <Keyword>not_eq</Keyword>
+        <Keyword>operator</Keyword>
+        <Keyword>or</Keyword>
+        <Keyword>or_eq</Keyword>
+        <Keyword>private</Keyword>
+        <Keyword>protected</Keyword>
+        <Keyword>public</Keyword>
+        <Keyword>reinterpret_cast</Keyword>
+        <Keyword>return</Keyword>
+        <Keyword>sizeof</Keyword>
+        <Keyword>static_cast</Keyword>
+        <Keyword>switch</Keyword>
+        <Keyword>this</Keyword>
+        <Keyword>throw</Keyword>
+        <Keyword>try</Keyword>
+        <Keyword>typeid</Keyword>
+        <Keyword>using</Keyword>
+        <Keyword>while</Keyword>
+        <Keyword>xor</Keyword>
+        <Keyword>xor_eq</Keyword>
+    </KeywordList>
+
+
+    <KeywordList style="datatype">
+		<Keyword>auto</Keyword>
+		<Keyword>bool</Keyword>
+		<Keyword>char</Keyword>
+		<Keyword>class</Keyword>
+		<Keyword>const</Keyword>
+		<Keyword>double</Keyword>
+        <Keyword>enum</Keyword>
+		<Keyword>explicit</Keyword>
+		<Keyword>export</Keyword>
+		<Keyword>extern</Keyword>
+		<Keyword>float</Keyword>
+		<Keyword>inline</Keyword>
+		<Keyword>int</Keyword>
+		<Keyword>long</Keyword>
+		<Keyword>mutable</Keyword>
+		<Keyword>namespace</Keyword>
+		<Keyword>register</Keyword>
+		<Keyword>short</Keyword>
+		<Keyword>signed</Keyword>
+		<Keyword>static</Keyword>
+		<Keyword>struct</Keyword>
+		<Keyword>template</Keyword>
+		<Keyword>typedef</Keyword>
+		<Keyword>typename</Keyword>
+		<Keyword>union</Keyword>
+		<Keyword>unsigned</Keyword>
+		<Keyword>virtual</Keyword>
+		<Keyword>void</Keyword>
+		<Keyword>volatile</Keyword>
+		<Keyword>wchar_t</Keyword>
+    </KeywordList>
+    
+    <!-- Comments -->
+    <Pattern style="comment" flags="S">//.*?$</Pattern>
+    <String style="comment">
+        <Starts>/\*</Starts>
+        <Ends>\*/</Ends>
+    </String>
+    
+    <!-- String -->
+    <String style="string" escape="\">
+        <Starts>"</Starts>
+        <Ends>"</Ends>
+    </String>
+    
+    <Pattern style="preprocessor">^[ \t]#.*$</Pattern>
+</Syntax>

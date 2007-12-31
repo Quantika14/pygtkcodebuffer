@@ -27,13 +27,16 @@ from xml.sax.saxutils import unescape
 
 
 DEFAULT_STYLES = {
-    'DEFAULT': {'font': 'monospace'},
-    'comment': {'foreground': 'blue'},
-    'keyword': {'foreground': 'darkred',
-                'weight': 700},
-    'special': {'foreground': 'turquoise'},
-    'string':  {'foreground': 'magenta'},
-    'number':  {'foreground': 'magenta'} }
+    'DEFAULT':      {'font': 'monospace'},
+    'comment':      {'foreground': 'blue'},
+    'preprocessor': {'foreground': 'violet'},
+    'keyword':      {'foreground': 'darkred',
+                     'weight': 700},
+    'special':      {'foreground': 'turquoise'},
+    'string':       {'foreground': 'magenta'},
+    'number':       {'foreground': 'magenta'},
+    'datatype':     {'foreground': 'sea green',
+                     'weight': 700} }
         
         
 SYNTAX_PATH = [os.path.join(os.path.expanduser('~'),".pygtkcodebuffer"),
@@ -103,9 +106,15 @@ class KeywordList(Pattern):
         
     
 class String:
-    def __init__(self, starts, ends, escape="\\", style="string"):
+    def __init__(self, starts, ends, escape=None, style="string"):
         self._starts  = re.compile(starts)
-        end_exp = "[^%(esc)s](?:%(esc)s%(esc)s)*%(end)s"%{'esc':escape*2,'end':ends}
+        
+        if escape:
+            end_exp = "[^%(esc)s](?:%(esc)s%(esc)s)*%(end)s"
+            end_exp = end_exp%{'esc':escape*2,'end':ends}
+        else:
+            end_exp = ends
+            
         self._ends    = re.compile(end_exp)
         self.tag_name = style
 
@@ -256,7 +265,9 @@ class SyntaxLoader(ContentHandler, LanguageDefinition):
     #handle String-definitions
     def startString(self, attr):
         self.__style = "string"
-        self.__escape = attr['escape']
+        self.__escape = None
+        if 'escape' in attr.keys():
+            self.__escape = attr['escape']
         if 'style' in attr.keys():
             self.__style = attr['style']
         self.__start_pattern = None
