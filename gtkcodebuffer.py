@@ -105,7 +105,8 @@ class KeywordList(Pattern):
 class String:
     def __init__(self, starts, ends, escape="\\", style="string"):
         self._starts  = re.compile(starts)
-        self._ends    = re.compile(ends)
+        end_exp = "[^%(esc)s](?:%(esc)s%(esc)s)%(end)s"%{'esc':escape*2,'end':ends}
+        self._ends    = re.compile(end_exp)
         self.tag_name = style
 
 

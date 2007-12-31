@@ -2,25 +2,39 @@
 
 <Syntax>
     <KeywordList>
-        <Keyword>if</Keyword>
-        <Keyword>else</Keyword>
-        <Keyword>elif</Keyword>
         <Keyword>and</Keyword>
-        <Keyword>or</Keyword>
-        <Keyword>not</Keyword>
-        <Keyword>in</Keyword>
-        <Keyword>return</Keyword>
-        <Keyword>pass</Keyword>
-        <Keyword>raise</Keyword>
-        <Keyword>import</Keyword>
+        <Keyword>as</Keyword>
+        <Keyword>assert</Keyword>
+        <Keyword>break</Keyword>
+        <Keyword>class</Keyword>
+        <Keyword>continue</Keyword>
+        <Keyword>def</Keyword>
+        <Keyword>del</Keyword>
+        <Keyword>elif</Keyword>
+        <Keyword>else</Keyword>
+        <Keyword>except</Keyword>
+        <Keyword>exec</Keyword>
+        <Keyword>finally</Keyword>
+        <Keyword>for</Keyword>
         <Keyword>from</Keyword>
+        <Keyword>global</Keyword>
+        <Keyword>if</Keyword>
+        <Keyword>import</Keyword>
+        <Keyword>in</Keyword>
+        <Keyword>is</Keyword>
+        <Keyword>lambda</Keyword>
+        <Keyword>not</Keyword>        
+        <Keyword>or</Keyword>
+        <Keyword>pass</Keyword>
+        <Keyword>print</Keyword>
+        <Keyword>raise</Keyword>
+        <Keyword>return</Keyword>
+        <Keyword>try</Keyword>
+        <Keyword>while</Keyword>
+        <Keyword>with</Keyword>
+        <Keyword>yield</Keyword>
     </KeywordList>
 
-    <KeywordList>
-        <Keyword>def</Keyword>
-        <Keyword>class</Keyword>
-    </KeywordList>
-    
     <KeywordList style="number">
         <Keyword>True</Keyword>
         <Keyword>False</Keyword>
