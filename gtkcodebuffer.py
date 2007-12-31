@@ -273,7 +273,7 @@ class SyntaxLoader(ContentHandler, LanguageDefinition):
 
 
 class CodeBuffer(gtk.TextBuffer):
-    def __init__(self, table=None, langdef=None, styles={}):
+    def __init__(self, table=None, lang=None, styles={}):
         gtk.TextBuffer.__init__(self, table)
 
         # default styles    
@@ -289,7 +289,7 @@ class CodeBuffer(gtk.TextBuffer):
             self.create_tag(name, **style)
         
         # store lang-definition
-        self._lang_def = langdef
+        self._lang_def = lang
         
         self.connect_after("insert-text", self._on_insert_text)
         self.connect_after("delete-range", self._on_delete_range)
