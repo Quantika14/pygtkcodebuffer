@@ -203,13 +203,13 @@ class SyntaxLoader(ContentHandler, LanguageDefinition):
         
     def startElement(self, name, attr):
         self.__stack.append( (name, attr) )
-        if hasattr(self, "start%s"%name):
-            handler = getattr(self, "start%s"%name)
+        if hasattr(self, "start_%s"%name):
+            handler = getattr(self, "start_%s"%name)
             handler(attr)
     
     def endElement(self, name):
-        if hasattr(self, "end%s"%name):
-            handler = getattr(self, "end%s"%name)
+        if hasattr(self, "end_%s"%name):
+            handler = getattr(self, "end_%s"%name)
             handler()
         del self.__stack[-1]
 
@@ -217,13 +217,13 @@ class SyntaxLoader(ContentHandler, LanguageDefinition):
         if not self.__stack: return
         name, attr = self.__stack[-1]
         
-        if hasattr(self, "chars%s"%name):
-            handler = getattr(self, "chars%s"%name)
+        if hasattr(self, "chars_%s"%name):
+            handler = getattr(self, "chars_%s"%name)
             handler(txt)
             
 
     # Handle regexp-patterns
-    def startPattern(self, attr):
+    def start_pattern(self, attr):
         self.__pattern = None
         self.__group   = 0
         self.__flags   = ''
@@ -231,7 +231,7 @@ class SyntaxLoader(ContentHandler, LanguageDefinition):
         if 'group' in attr.keys(): self.__group = int(attr['group'])
         if 'flags' in attr.keys(): self.__flags = attr['flags']
         
-    def endPattern(self):
+    def end_pattern(self):
         rule = Pattern(self.__pattern, self.__style, self.__group, self.__flags)
         self._grammar.append(rule)
         del self.__pattern
@@ -239,31 +239,31 @@ class SyntaxLoader(ContentHandler, LanguageDefinition):
         del self.__flags
         del self.__style
         
-    def charsPattern(self, txt):
+    def chars_pattern(self, txt):
         self.__pattern = unescape(txt)
                     
 
     # handle keyword-lists
-    def startKeywordList(self, attr):
+    def start_keywordlist(self, attr):
         self.__style = "keyword"
         if 'style' in attr.keys():
             self.__style = attr['style']
         self.__keywords = []
         
-    def endKeywordList(self):
+    def end_keywordlist(self):
         kwlist = KeywordList(self.__keywords, self.__style)
         self._grammar.append(kwlist)
         del self.__keywords
         del self.__style
             
-    def charsKeyword(self, txt):
+    def chars_keyword(self, txt):
         parent,pattr = self.__stack[-2]
-        if not parent == "KeywordList": return
+        if not parent == "keywordlist": return
         self.__keywords.append(unescape(txt))
 
 
     #handle String-definitions
-    def startString(self, attr):
+    def start_string(self, attr):
         self.__style = "string"
         self.__escape = None
         if 'escape' in attr.keys():
@@ -273,7 +273,7 @@ class SyntaxLoader(ContentHandler, LanguageDefinition):
         self.__start_pattern = None
         self.__end_pattern = None
 
-    def endString(self):
+    def end_string(self):
         strdef = String(self.__start_pattern, self.__end_pattern,
                         self.__escape, self.__style)
         self._grammar.append(strdef)
@@ -282,10 +282,10 @@ class SyntaxLoader(ContentHandler, LanguageDefinition):
         del self.__start_pattern
         del self.__end_pattern
         
-    def charsStarts(self, txt):
+    def chars_starts(self, txt):
         self.__start_pattern = unescape(txt)
         
-    def charsEnds(self, txt):
+    def chars_ends(self, txt):
         self.__end_pattern = unescape(txt)
 
 

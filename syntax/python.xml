@@ -1,70 +1,70 @@
 <?xml version="1.0"?>
 
-<Syntax>
-    <KeywordList>
-        <Keyword>and</Keyword>
-        <Keyword>as</Keyword>
-        <Keyword>assert</Keyword>
-        <Keyword>break</Keyword>
-        <Keyword>class</Keyword>
-        <Keyword>continue</Keyword>
-        <Keyword>def</Keyword>
-        <Keyword>del</Keyword>
-        <Keyword>elif</Keyword>
-        <Keyword>else</Keyword>
-        <Keyword>except</Keyword>
-        <Keyword>exec</Keyword>
-        <Keyword>finally</Keyword>
-        <Keyword>for</Keyword>
-        <Keyword>from</Keyword>
-        <Keyword>global</Keyword>
-        <Keyword>if</Keyword>
-        <Keyword>import</Keyword>
-        <Keyword>in</Keyword>
-        <Keyword>is</Keyword>
-        <Keyword>lambda</Keyword>
-        <Keyword>not</Keyword>        
-        <Keyword>or</Keyword>
-        <Keyword>pass</Keyword>
-        <Keyword>print</Keyword>
-        <Keyword>raise</Keyword>
-        <Keyword>return</Keyword>
-        <Keyword>try</Keyword>
-        <Keyword>while</Keyword>
-        <Keyword>with</Keyword>
-        <Keyword>yield</Keyword>
-    </KeywordList>
+<syntax>
+    <keywordlist>
+        <keyword>and</keyword>
+        <keyword>as</keyword>
+        <keyword>assert</keyword>
+        <keyword>break</keyword>
+        <keyword>class</keyword>
+        <keyword>continue</keyword>
+        <keyword>def</keyword>
+        <keyword>del</keyword>
+        <keyword>elif</keyword>
+        <keyword>else</keyword>
+        <keyword>except</keyword>
+        <keyword>exec</keyword>
+        <keyword>finally</keyword>
+        <keyword>for</keyword>
+        <keyword>from</keyword>
+        <keyword>global</keyword>
+        <keyword>if</keyword>
+        <keyword>import</keyword>
+        <keyword>in</keyword>
+        <keyword>is</keyword>
+        <keyword>lambda</keyword>
+        <keyword>not</keyword>        
+        <keyword>or</keyword>
+        <keyword>pass</keyword>
+        <keyword>print</keyword>
+        <keyword>raise</keyword>
+        <keyword>return</keyword>
+        <keyword>try</keyword>
+        <keyword>while</keyword>
+        <keyword>with</keyword>
+        <keyword>yield</keyword>
+    </keywordlist>
 
-    <KeywordList style="number">
-        <Keyword>True</Keyword>
-        <Keyword>False</Keyword>
-    </KeywordList>
+    <keywordlist style="number">
+        <keyword>True</keyword>
+        <keyword>False</keyword>
+    </keywordlist>
     
-    <KeywordList style="special">
-        <Keyword>self</Keyword>
-    </KeywordList>
+    <keywordlist style="special">
+        <keyword>self</keyword>
+    </keywordlist>
     
-    <Pattern style="comment">#.*$</Pattern>
-    <Pattern style="number" group="1">\W(\d+(?:\.\d+|\.\d+e[\-]?\d+)?)\W</Pattern>
+    <pattern style="comment">#.*$</pattern>
+    <pattern style="number" group="1">\W(\d+(?:\.\d+|\.\d+e[\-]?\d+)?)\W</pattern>
     
-    <String escape="\">
-        <Starts>"""</Starts>
-        <Ends>"""</Ends>
-    </String>
+    <string escape="\">
+        <starts>"""</starts>
+        <ends>"""</ends>
+    </string>
     
-    <String escape="\">
-        <Starts>'''</Starts>
-        <Ends>'''</Ends>
-    </String>
+    <string escape="\">
+        <starts>'''</starts>
+        <ends>'''</ends>
+    </string>
     
-    <String escape="\">
-        <Starts>"</Starts>
-        <Ends>"</Ends>
-    </String>
+    <string escape="\">
+        <starts>"</starts>
+        <ends>"</ends>
+    </string>
     
-    <String escape="\">
-        <Starts>'</Starts>
-        <Ends>'</Ends>
-    </String>
+    <string escape="\">
+        <starts>'</starts>
+        <ends>'</ends>
+    </string>
     
-</Syntax>
+</syntax>
