@@ -13,6 +13,6 @@ scr.add(gtk.TextView(buff))
 win.set_default_size(300,200)
 win.show_all()
         
-buff.set_text(r'A test string with "quot\\\"es"')
+buff.set_text(r'A test string with "quot\\\"es" ...')
         
 gtk.main()        

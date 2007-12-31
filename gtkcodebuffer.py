@@ -39,7 +39,7 @@ DEFAULT_STYLES = {
 SYNTAX_PATH = [os.path.join(os.path.expanduser('~'),".pygtkcodebuffer"),
                os.path.join(sys.prefix,"share","pygtkcodebuffer","syntax")]
 
-DEBUG_FLAG  = False
+DEBUG_FLAG  = True
 
 
 
@@ -105,21 +105,28 @@ class KeywordList(Pattern):
 class String:
     def __init__(self, starts, ends, escape="\\", style="string"):
         self._starts  = re.compile(starts)
-        end_exp = "[^%(esc)s](?:%(esc)s%(esc)s)%(end)s"%{'esc':escape*2,'end':ends}
+        end_exp = "[^%(esc)s](?:%(esc)s%(esc)s)*%(end)s"%{'esc':escape*2,'end':ends}
         self._ends    = re.compile(end_exp)
         self.tag_name = style
 
 
     def __call__(self, txt, start, end):
+        if DEBUG_FLAG:
+            print "Search string (%s) at %i..."%(self._starts.pattern, start.get_offset())
+        
         start_match = self._starts.search(txt)
         if not start_match: return
         
+        if DEBUG_FLAG:
+            print "... found string start at %s"%(start_match.start(0))
+            
         start_it = start.copy()
         start_it.forward_chars(start_match.start(0))
         end_it   = end.copy()
         
         end_match = self._ends.search(txt, start_match.end(0))
         if end_match:
+            print "... found string and at %s"%(start.get_offset()+end_match.end(0))
             end_it.set_offset(start.get_offset()+end_match.end(0))            
             
         return  start_it, end_it
