@@ -37,7 +37,7 @@ DEFAULT_STYLES = {
         
         
 SYNTAX_PATH = [os.path.join(os.path.expanduser('~'),".pygtkcodebuffer"),
-               os.path.join(sys.exec_prefix,"share","pygtkcodebuffer","syntax")]
+               os.path.join(sys.prefix,"share","pygtkcodebuffer","syntax")]
 
 DEBUG_FLAG  = False
 
