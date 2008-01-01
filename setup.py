@@ -3,12 +3,15 @@
 
 from distutils.core import setup
 
-desc = """ PyGTKCodeBuffer """
+desc = """PyGTKCodeBuffer - Lightweight syntax-highlighting for PyGTK's TextView-widget."""
 
-long_desc = """ PyGTKCodeBuffer"""
+long_desc = """PyGTKCodeBuffer is a syntax-highlighting engine written in pure 
+Python to provide maximum portability. It depends only on PyGTK and the Python 
+standard library. No Gnome nor Scintilla libraries are needed so it should run 
+perfectly under all platforms supported by PyGTK!"""
 
 setup ( name = 'PyGTKCodeBuffer',
-        version = '0.99.5',
+        version = '0.1.0',
         description = desc,
         long_description = long_desc,
         author = 'Hannes Matuschek',
