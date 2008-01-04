@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+
+<syntax>
+
+    <!-- emphasis -->
+    <string style="datatype">
+        <starts>\*</starts>
+        <ends>\*</ends>
+    </string>
+
+    <!-- strong emphasis -->
+    <string style="datatype">
+        <starts>\*\*</starts>
+        <ends>\*\*</ends>
+    </string>
+
+    <!-- code -->
+    <string style="special">
+        <starts>`</starts>
+        <ends>`</ends>
+    </string> 
+
+    <!-- headings -->
+    <pattern style="keyword">^#+.+$</pattern>
+
+    <!-- lists -->
+    <pattern style="comment" group="1">^(- ).+$</pattern>
+    <pattern style="comment" group="1">^(\d+\. ).+$</pattern>
+
+</syntax>

@@ -11,21 +11,23 @@ standard library. No Gnome nor Scintilla libraries are needed so it should run
 perfectly under all platforms supported by PyGTK!"""
 
 setup ( name = 'PyGTKCodeBuffer',
-        version = '0.1.0',
+        version = '0.2.0',
         description = desc,
         long_description = long_desc,
         author = 'Hannes Matuschek',
         author_email = 'hmatuschek@gmail.com',
         url = 'http://pygtkcodebuffer.googlecode.com',
-
-        classifiers = ['Development Status :: 5 - Production/Stable',
+        download_url = 'http://pygtkcodebuffer.googlecode.com/files/PyGTKCodeBuffer-0.1.0.tar.bz2',
+        
+        classifiers = ['Development Status :: 4 - Beta',
                        'Environment :: X11 Applications :: GTK',
-                       'Intended Audience :: Education',
-                       'Intended Audience :: End Users/Desktop',
-                       'License :: OSI Approved :: GNU General Public License (GPL)',
-                       'Operating System :: POSIX :: Linux',
+                       'Intended Audience :: Developers',
+                       'License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)',
+                       'Operating System :: OS Independent',
                        'Programming Language :: Python',
-                       'Topic :: Communications :: Ham Radio'], 
+                       'Topic :: Software Development :: Libraries :: Python Modules',
+                       'Topic :: Software Development :: Widget Sets',
+                       'Topic :: Text Editors'], 
 
         py_modules = ['gtkcodebuffer'],
         

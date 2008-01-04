@@ -22,8 +22,10 @@ import re
 import sys
 import os.path
 import xml.sax
+import imp
 from xml.sax.handler import ContentHandler
 from xml.sax.saxutils import unescape
+
 
 
 DEFAULT_STYLES = {
@@ -38,16 +40,33 @@ DEFAULT_STYLES = {
     'datatype':     {'foreground': 'sea green',
                      'weight': 700} }
         
-        
-SYNTAX_PATH = [os.path.join(os.path.expanduser('~'),".pygtkcodebuffer"),
-               os.path.join(sys.prefix,"share","pygtkcodebuffer","syntax")]
 
-DEBUG_FLAG  = True
+
+def main_is_frozen():
+    return (hasattr(sys, "frozen") or # new py2exe
+            hasattr(sys, "importers") # old py2exe
+            or imp.is_frozen("__main__")) # tools/freeze
+
+
+if main_is_frozen():
+    this_module_path = os.path.dirname(sys.executable)
+else:
+    this_module_path = os.path.abspath(os.path.dirname(__file__))
+
+
+SYNTAX_PATH = [ os.path.join('.', 'syntax'),
+                this_module_path,
+                os.path.join(os.path.expanduser('~'),".pygtkcodebuffer"),
+                os.path.join(sys.prefix,"share","pygtkcodebuffer","syntax")]
+         
+
+DEBUG_FLAG  = False
 
 
 
 
 def add_syntax_path(path_or_list):
+    global SYNTAX_PATH
     if isinstance(path_or_list, (list, tuple)):
         for i in range(len(path_or_list)):
             SYNTAX_PATH.insert(0, path_or_list[-i])
@@ -135,7 +154,8 @@ class String:
         
         end_match = self._ends.search(txt, start_match.end(0))
         if end_match:
-            print "... found string and at %s"%(start.get_offset()+end_match.end(0))
+            if DEBUG_FLAG:
+                print "... found string and at %s"%(start.get_offset()+end_match.end(0))
             end_it.set_offset(start.get_offset()+end_match.end(0))            
             
         return  start_it, end_it
@@ -184,13 +204,17 @@ class SyntaxLoader(ContentHandler, LanguageDefinition):
     def __init__(self, lang_name):
         LanguageDefinition.__init__(self, [])
         ContentHandler.__init__(self)
-        
+       
+        print SYNTAX_PATH 
         # search for syntax-files:
         fname = None
         for syntax_dir in SYNTAX_PATH:
             fname = os.path.join(syntax_dir, "%s.xml"%lang_name)
             if os.path.isfile(fname): break
-            
+
+        if DEBUG_FLAG:
+            print "Loading syntaxfile %s"%fname
+
         xml.sax.parse(fname, self)
       
         
@@ -318,7 +342,7 @@ class CodeBuffer(gtk.TextBuffer):
         # if no syntax defined -> nop
         if not self._lang_def: return False
         
-        it.backward_chars(length)
+        it.backward_chars(length-1)
         tags = it.get_tags()
         if len(tags)>0:
             it.backward_to_tag_toggle(tags[0])
@@ -367,11 +391,10 @@ class CodeBuffer(gtk.TextBuffer):
         self.update_syntax(mend, end)
         
         
-    def reset_language(self, lang_def, style={}):
+    def reset_language(self, lang_def):
         start = self.get_start_iter()
         self.remove_all_tags(start, self.get_end_iter())
         self._lang_def = lang_def
-        self.styles.update(style)
         self.update_syntax(start)
         
         

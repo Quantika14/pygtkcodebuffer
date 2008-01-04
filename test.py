@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import gtk
-from gtkcodebuffer import CodeBuffer, SyntaxLoader
+from gtkcodebuffer import CodeBuffer, SyntaxLoader, add_syntax_path
+
 
 txt = """
 #include <stdio.h>
@@ -12,6 +13,7 @@ int main(void){
 }
 """
 
+add_syntax_path("./syntax/")
 
 lang = SyntaxLoader("cpp")
 buff = CodeBuffer(lang=lang)
@@ -23,6 +25,7 @@ scr.add(gtk.TextView(buff))
         
 win.set_default_size(300,200)
 win.show_all()
+win.connect("destroy", lambda w: gtk.main_quit())
         
 buff.set_text(txt)
         
