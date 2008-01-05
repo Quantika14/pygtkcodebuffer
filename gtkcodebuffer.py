@@ -303,8 +303,8 @@ class SyntaxLoader(ContentHandler, LanguageDefinition):
             self.__escape = attr['escape']
         if 'style' in attr.keys():
             self.__style = attr['style']
-        self.__start_pattern = None
-        self.__end_pattern = None
+        self.__start_pattern = ""
+        self.__end_pattern = ""
 
     def end_string(self):
         strdef = String(self.__start_pattern, self.__end_pattern,
@@ -316,10 +316,10 @@ class SyntaxLoader(ContentHandler, LanguageDefinition):
         del self.__end_pattern
         
     def chars_starts(self, txt):
-        self.__start_pattern = unescape(txt)
+        self.__start_pattern += unescape(txt)
         
     def chars_ends(self, txt):
-        self.__end_pattern = unescape(txt)
+        self.__end_pattern += unescape(txt)
 
 
 
