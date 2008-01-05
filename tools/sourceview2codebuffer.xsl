@@ -52,6 +52,7 @@
 <xsl:template match="keyword-list">
     <keywordlist>
         <xsl:call-template name="style-attr"/>
+        <xsl:call-template name="flags-attr"/>
         <xsl:apply-templates />
     </keywordlist>
 </xsl:template>
@@ -149,6 +150,13 @@
             <xsl:message>Unknwon style-name "<xsl:value-of select="./@style"/>"</xsl:message>
         </xsl:otherwise>
     </xsl:choose>
+</xsl:template>
+
+
+<xsl:template name="flags-attr">
+    <xsl:attribute name="flags">
+        <xsl:if test="./@case-sensitive='FALSE' or ./@case-sensitive='false'">I</xsl:if>
+    </xsl:attribute>
 </xsl:template>
 
 

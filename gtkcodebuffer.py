@@ -117,9 +117,9 @@ class Pattern:
 
 
 class KeywordList(Pattern):
-    def __init__(self, keywords, style="keyword"):
+    def __init__(self, keywords, style="keyword", flags=""):
         regexp = "(?:\W|^)(%s)\W"%("|".join(keywords),)
-        Pattern.__init__(self, regexp, style, group=1, flags="")
+        Pattern.__init__(self, regexp, style, group=1, flags=flags)
         
         
         
@@ -271,16 +271,20 @@ class SyntaxLoader(ContentHandler, LanguageDefinition):
     # handle keyword-lists
     def start_keywordlist(self, attr):
         self.__style = "keyword"
+        self.__flags = ""
         if 'style' in attr.keys():
             self.__style = attr['style']
+        if 'flags' in attr.keys():
+            self.__flags = attr['flags']
         self.__keywords = []
         
     def end_keywordlist(self):
-        kwlist = KeywordList(self.__keywords, self.__style)
+        kwlist = KeywordList(self.__keywords, self.__style, self.__flags)
         self._grammar.append(kwlist)
         del self.__keywords
         del self.__style
-            
+        del self.__flags
+    
     def chars_keyword(self, txt):
         parent,pattr = self.__stack[-2]
         if not parent == "keywordlist": return
