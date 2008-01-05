@@ -137,13 +137,13 @@
             <xsl:attribute name="style">function</xsl:attribute>
         </xsl:when>
         <xsl:when test="./@style='Others'">
-            <xsl:attribute name="style">special</xsl:attribute>
+            <xsl:attribute name="style">datatype</xsl:attribute>
         </xsl:when>
         <xsl:when test="./@style='Others 2'">
-            <xsl:attribute name="style">special</xsl:attribute>
+            <xsl:attribute name="style">mark1</xsl:attribute>
         </xsl:when>
         <xsl:when test="./@style='Others 3'">
-            <xsl:attribute name="style">special</xsl:attribute>
+            <xsl:attribute name="style">mark2</xsl:attribute>
         </xsl:when>
         
         <xsl:otherwise>

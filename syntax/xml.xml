@@ -20,11 +20,11 @@
  
 	<pattern style="keyword">(&amp;|%)[a-zA-Z0-9#][a-zA-Z0-9]*;</pattern>
 
-	<pattern style="special">\??&gt;</pattern>
+	<pattern style="mark2">\??&gt;</pattern>
 
-	<pattern style="special">(&lt;/?[a-zA-Z_:][a-zA-Z0-9_:-]*(\b|\&gt;)|&lt;\?[xX][mM][lL]\b)</pattern>
+	<pattern style="mark2">(&lt;/?[a-zA-Z_:][a-zA-Z0-9_:-]*(\b|\&gt;)|&lt;\?[xX][mM][lL]\b)</pattern>
 
-	<pattern style="special">[ \t][a-zA-Z_:][a-zA-Z0-9_:-]*\b[ \t]*=</pattern>
+	<pattern style="mark1">[ \t][a-zA-Z_:][a-zA-Z0-9_:-]*\b[ \t]*=</pattern>
 
 	<pattern style="number">#[a-fA-F0-9][a-fA-F0-9][a-fA-F0-9][a-fA-F0-9][a-fA-F0-9][a-fA-F0-9]</pattern>
 

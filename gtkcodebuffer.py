@@ -30,16 +30,18 @@ from xml.sax.saxutils import unescape
 
 DEFAULT_STYLES = {
     'DEFAULT':      {'font': 'monospace'},
-    'comment':      {'foreground': 'blue'},
-    'preprocessor': {'foreground': 'violet'},
-    'keyword':      {'foreground': 'darkred',
+    'comment':      {'foreground': '#0000FF'},
+    'preprocessor': {'foreground': '#A020F0'},
+    'keyword':      {'foreground': '#A52A2A',
                      'weight': 700},
     'special':      {'foreground': 'turquoise'},
-    'string':       {'foreground': 'magenta'},
-    'number':       {'foreground': 'magenta'},
-    'datatype':     {'foreground': 'sea green',
+    'mark1':        {'foreground': '#008B8B'},
+    'mark2':        {'foreground': '#6A5ACD'},
+    'string':       {'foreground': '#FF00FF'},
+    'number':       {'foreground': '#FF00FF'},
+    'datatype':     {'foreground': '#2E8B57',
                      'weight': 700},
-    'function':     {'foreground': 'turquoise'} }
+    'function':     {'foreground': '#008A8C'} }
         
 
 def main_is_frozen():
@@ -94,7 +96,9 @@ class Pattern:
             if char == 'U': flag |= re.U
             if char == 'X': flag |= re.X
         # compile re        
-        self._regexp = re.compile(regexp, flag)
+        try: self._regexp = re.compile(regexp, flag)
+        except re.error, e: 
+            raise Exception("Invalid regexp \"%s\": %s"%(regexp,str(e)))
         self._group  = group
         self.tag_name = style
         
@@ -249,7 +253,7 @@ class SyntaxLoader(ContentHandler, LanguageDefinition):
 
     # Handle regexp-patterns
     def start_pattern(self, attr):
-        self.__pattern = None
+        self.__pattern = ""
         self.__group   = 0
         self.__flags   = ''
         self.__style   = attr['style']
@@ -265,7 +269,7 @@ class SyntaxLoader(ContentHandler, LanguageDefinition):
         del self.__style
         
     def chars_pattern(self, txt):
-        self.__pattern = unescape(txt)
+        self.__pattern += unescape(txt)
                     
 
     # handle keyword-lists
