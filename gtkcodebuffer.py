@@ -414,6 +414,6 @@ class CodeBuffer(gtk.TextBuffer):
             # else: update tag       
             else:
                 tag = table.lookup(name)
-                for key,val in styles.items():
-                    tag.set_property(name, val)
+                for key,val in style.items():
+                    tag.set_property(key, val)
                     
