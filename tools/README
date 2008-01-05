@@ -1,0 +1,5 @@
+This directory contains a tool (XSLT) to convert a GtkSourceView syntax-file 
+into a PyGTKCodeBuffer syntax-file. Simply call:
+
+xsltproc sourceview2codebuffer.xsl [INPUTFILE]
+

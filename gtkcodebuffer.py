@@ -38,9 +38,9 @@ DEFAULT_STYLES = {
     'string':       {'foreground': 'magenta'},
     'number':       {'foreground': 'magenta'},
     'datatype':     {'foreground': 'sea green',
-                     'weight': 700} }
+                     'weight': 700},
+    'function':     {'foreground': 'turquoise'} }
         
-
 
 def main_is_frozen():
     return (hasattr(sys, "frozen") or # new py2exe
@@ -205,7 +205,8 @@ class SyntaxLoader(ContentHandler, LanguageDefinition):
         LanguageDefinition.__init__(self, [])
         ContentHandler.__init__(self)
        
-        print SYNTAX_PATH 
+        if DEBUG_FLAG:
+            print SYNTAX_PATH 
         # search for syntax-files:
         fname = None
         for syntax_dir in SYNTAX_PATH:

@@ -4,14 +4,29 @@
 
     <!-- emphasis -->
     <string style="datatype">
-        <starts>\*</starts>
-        <ends>\*</ends>
+        <starts>\*\S</starts>
+        <ends>\S\*</ends>
     </string>
+    <string style="datatype">
+        <starts>\s\_\S</starts>
+        <ends>\S\_</ends>
+    </string>
+    <!-- single underscore may be buggy -->
 
     <!-- strong emphasis -->
     <string style="datatype">
-        <starts>\*\*</starts>
-        <ends>\*\*</ends>
+        <starts>\*\*\S</starts>
+        <ends>\S\*\*</ends>
+    </string>
+    <string style="datatype">
+        <starts>\_\_\S</starts>
+        <ends>\S\_\_</ends>
+    </string>
+
+    <!-- URLs (note the gt and lt signs are ampersand quoted) -->
+    <string style="datatype">
+        <starts>\&lt;</starts>
+        <ends>\&gt;</ends>
     </string>
 
     <!-- code -->
@@ -19,11 +34,18 @@
         <starts>`</starts>
         <ends>`</ends>
     </string> 
+    <pattern style="special">^\ \ \ \ .+$</pattern>
+    <pattern style="special">^\t.+$</pattern>
+
+    <!-- block quote (should the gt signs be ampersand quoted? Breaks if it is...) -->
+    <pattern style="special">^\>.+$</pattern>
 
     <!-- headings -->
     <pattern style="keyword">^#+.+$</pattern>
 
     <!-- lists -->
+    <pattern style="comment" group="1">^(\+ ).+$</pattern>
+    <pattern style="comment" group="1">^(\* ).+$</pattern>
     <pattern style="comment" group="1">^(- ).+$</pattern>
     <pattern style="comment" group="1">^(\d+\. ).+$</pattern>
 
