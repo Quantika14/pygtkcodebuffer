@@ -392,11 +392,28 @@ class CodeBuffer(gtk.TextBuffer):
         
         
     def reset_language(self, lang_def):
+        # remove all tags from complete text
         start = self.get_start_iter()
         self.remove_all_tags(start, self.get_end_iter())
+        # store lexer
         self._lang_def = lang_def
+        # and ...
         self.update_syntax(start)
         
         
+    def update_styles(self, styles):
+        self.styles.update(styles)
         
-    
+        table = self.get_tag_table()
+        for name, props in styles.items():
+            style = dict(DEFAULT_STYLES['DEFAULT'])
+            style.update(props)
+            # if tagname is unknown:
+            if not table.lookup(name):
+                self.create_tag(name, **style) 
+            # else: update tag       
+            else:
+                tag = table.lookup(name)
+                for key,val in styles.items():
+                    tag.set_property(name, val)
+                    
