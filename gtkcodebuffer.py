@@ -289,11 +289,18 @@ class SyntaxLoader(ContentHandler, LanguageDefinition):
         del self.__keywords
         del self.__style
         del self.__flags
+        
+    def start_keyword(self, attr):
+        self.__keywords.append("")
     
+    def end_keyword(self):
+        if not self.__keywords[-1]:
+            del self.__keywords[-1]
+                
     def chars_keyword(self, txt):
         parent,pattr = self.__stack[-2]
         if not parent == "keywordlist": return
-        self.__keywords.append(unescape(txt))
+        self.__keywords[-1] += unescape(txt)
 
 
     #handle String-definitions
