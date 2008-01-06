@@ -363,6 +363,9 @@ class CodeBuffer(gtk.TextBuffer):
         
         if not it.begins_tag():
             it.backward_to_tag_toggle(None)
+
+        if it.begins_tag(self.get_tag_table().lookup("DEFAULT")):
+            it.backward_to_tag_toggle(None)
             
         self.update_syntax(it)        
         
@@ -388,7 +391,7 @@ class CodeBuffer(gtk.TextBuffer):
         #   -> finished
         if tagname:     #if something found
             tag = self.get_tag_table().lookup(tagname)
-            if mstart.begins_tag(tag) and mend.ends_tag(tag):
+            if mstart.begins_tag(tag) and mend.ends_tag(tag) and not mstart.equal(start):
                 return
                 
         # remove all tags from start..mend (mend == buffer-end if no match)        
