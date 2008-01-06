@@ -44,6 +44,7 @@ DEFAULT_STYLES = {
     'function':     {'foreground': '#008A8C'} }
         
 
+
 def main_is_frozen():
     return (hasattr(sys, "frozen") or # new py2exe
             hasattr(sys, "importers") # old py2exe
@@ -351,7 +352,7 @@ class CodeBuffer(gtk.TextBuffer):
         # if no syntax defined -> nop
         if not self._lang_def: return False
         
-        it.backward_chars(length-1)
+        it.backward_chars(length)
         tags = it.get_tags()
         if len(tags)>0:
             it.backward_to_tag_toggle(tags[0])
@@ -420,9 +421,7 @@ class CodeBuffer(gtk.TextBuffer):
             # if tagname is unknown:
             if not table.lookup(name):
                 self.create_tag(name, **style) 
-            # else: update tag       
-            else:
+            else: # update tag
                 tag = table.lookup(name)
-                for key,val in style.items():
-                    tag.set_property(key, val)
+                map(lambda k,v: tag.set_property(k,v), style.items())
                     

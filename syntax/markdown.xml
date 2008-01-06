@@ -38,7 +38,7 @@
     <pattern style="special">^\t.+$</pattern>
 
     <!-- block quote (should the gt signs be ampersand quoted? Breaks if it is...) -->
-    <pattern style="special">^\>.+$</pattern>
+    <pattern style="special">^\&gt;.+$</pattern>
 
     <!-- headings -->
     <pattern style="keyword">^#+.+$</pattern>

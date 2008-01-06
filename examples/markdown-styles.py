@@ -31,7 +31,8 @@ syntax-definition. Supporting `code-segments`,
 # additional style definitions:
 #   the update_syntax() method of CodeBuffer allows you to define new and modify
 #   already defined styles. Think of it like CSS.
-styles = { 'bold':      {'weight': 700},
+styles = { 'DEFAULT':   {'font': 'serif'},
+           'bold':      {'weight': 700},
            'comment':   {'foreground': 'gray',
                          'weight': 700},
            'heading':   {'variant': pango.VARIANT_SMALL_CAPS,
@@ -48,13 +49,8 @@ list2 = Pattern(r"^(\d+\. ).+$", style="comment", group=1)
 # create lexer: 
 lang = LanguageDefinition([emph, emph2, code, head, list1, list2])
 
-# or load from file... 
-#add_syntax_path("./../syntax")
-#lang = SyntaxLoader("markdown")
-
 # create buffer and update style-definition 
-buff = CodeBuffer(lang=lang)
-buff.update_styles(styles)
+buff = CodeBuffer(lang=lang, styles=styles)
 
 win = gtk.Window(gtk.WINDOW_TOPLEVEL)
 scr = gtk.ScrolledWindow()
