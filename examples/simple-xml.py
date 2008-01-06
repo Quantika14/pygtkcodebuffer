@@ -7,6 +7,7 @@ from gtkcodebuffer import CodeBuffer, SyntaxLoader, add_syntax_path
 #   Note: You need to have PyGTKCodeBuffer installed!
 
 txt = """<?xml version="1.0"?>
+<!-- a <comment> -->
 <DocumentRoot attribute="value">
     Some &gt;text&lt;...
     <ns:tag>content</ns:tag>
