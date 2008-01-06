@@ -145,7 +145,7 @@ class String:
 
     def __call__(self, txt, start, end):
         if DEBUG_FLAG:
-            print "Search string (%s) at %i..."%(self._starts.pattern, start.get_offset())
+            print "Search string (%s) at %i..."%(self._starts.pattern,start.get_offset())
         
         start_match = self._starts.search(txt)
         if not start_match: return
@@ -157,10 +157,10 @@ class String:
         start_it.forward_chars(start_match.start(0))
         end_it   = end.copy()
         
-        end_match = self._ends.search(txt, start_match.end(0))
+        end_match = self._ends.search(txt, start_match.end(0)-1)
         if end_match:
             if DEBUG_FLAG:
-                print "... found string and at %s"%(start.get_offset()+end_match.end(0))
+                print "... found string and at %s"%(end_match.end(0))
             end_it.set_offset(start.get_offset()+end_match.end(0))            
             
         return  start_it, end_it
@@ -358,23 +358,22 @@ class CodeBuffer(gtk.TextBuffer):
     def _on_insert_text(self, buf, it, text, length):
         # if no syntax defined -> nop
         if not self._lang_def: return False
-        
+
         it.backward_chars(length)
-        tags = it.get_tags()
-        if len(tags)>0:
-            it.backward_to_tag_toggle(tags[0])
-                
+        
+        if not it.begins_tag():
+            it.backward_to_tag_toggle(None)
+            
         self.update_syntax(it)        
         
         
     def _on_delete_range(self, buf, start, end):
         # if no syntax defined -> nop
         if not self._lang_def: return False
-        
-        tags = start.get_tags()
-        if len(tags)>0:
-            start.backward_to_tag_toggle(tags[0])
-        
+
+        if not start.begins_tag():
+            start.backward_to_tag_toggle(None)
+                    
         self.update_syntax(start)        
         
     
