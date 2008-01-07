@@ -1,11 +1,14 @@
 #!/usr/bin/python
 import gtk
+import sys
+
+# comment-out if CodeBuffer is installed
+sys.path.insert(0, "..")
 from gtkcodebuffer import CodeBuffer, SyntaxLoader, add_syntax_path
 
-#
-# This example shows how to use the CodeBuffer. 
-#   Note: You need to have PyGTKCodeBuffer installed!
 
+# comment-out if CodeBuffer is installed
+add_syntax_path("../syntax")
 
 lang = SyntaxLoader("python")
 buff = CodeBuffer(lang=lang)

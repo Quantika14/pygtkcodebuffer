@@ -353,22 +353,39 @@ class CodeBuffer(gtk.TextBuffer):
         
         self.connect_after("insert-text", self._on_insert_text)
         self.connect_after("delete-range", self._on_delete_range)
+        self.connect('apply-tag', self._on_apply_tag)
         
-        
+        self._apply_tags = False
+                
+                
+    def _on_apply_tag(self, buf, tag, start, end):
+        # FIXME This is a hack! It allows apply-tag only while
+        #       _on_insert_text() and _on_delete_range()
+        if not self._apply_tags:
+            self.emit_stop_by_name('apply-tag')
+            return True
+            
+                        
     def _on_insert_text(self, buf, it, text, length):
         # if no syntax defined -> nop
         if not self._lang_def: return False
-
+        
         it = it.copy()
         it.backward_chars(length)
         
         if not it.begins_tag():
             it.backward_to_tag_toggle(None)
+            if DEBUG_FLAG:
+                print "Not tag-start -> moved iter to %i (%s)"%(it.get_offset(), it.get_char()) 
 
         if it.begins_tag(self.get_tag_table().lookup("DEFAULT")):
             it.backward_to_tag_toggle(None)
+            if DEBUG_FLAG:
+                print "Iter at DEFAULT-start -> moved to %i (%s)"%(it.get_offset(), it.get_char())
             
+        self._apply_tags = True    
         self.update_syntax(it)        
+        self._apply_tags = False
         
         
     def _on_delete_range(self, buf, start, end):
@@ -378,8 +395,10 @@ class CodeBuffer(gtk.TextBuffer):
         start = start.copy()
         if not start.begins_tag():
             start.backward_to_tag_toggle(None)
-                    
+    
+        self._apply_tags = True                
         self.update_syntax(start)        
+        self._apply_tags = False
         
     
     def update_syntax(self, start, end=None):
@@ -394,6 +413,8 @@ class CodeBuffer(gtk.TextBuffer):
         if tagname:     #if something found
             tag = self.get_tag_table().lookup(tagname)
             if mstart.begins_tag(tag) and mend.ends_tag(tag) and not mstart.equal(start):
+                if DEBUG_FLAG:
+                    print "Optimized: Found tag at %i (%s)"%(mstart.get_offset(), mstart.get_char())
                 return
                 
         # remove all tags from start..mend (mend == buffer-end if no match)        

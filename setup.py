@@ -15,13 +15,13 @@ standard library. No Gnome nor Scintilla libraries are needed so it should run
 perfectly under all platforms supported by PyGTK!"""
 
 setup ( name = 'PyGTKCodeBuffer',
-        version = '0.3.3',
+        version = '0.3.4',
         description = desc,
         long_description = long_desc,
         author = 'Hannes Matuschek',
         author_email = 'hmatuschek@gmail.com',
         url = 'http://pygtkcodebuffer.googlecode.com',
-        download_url = 'http://pygtkcodebuffer.googlecode.com/files/PyGTKCodeBuffer-0.3.3.tar.bz2',
+        download_url = 'http://pygtkcodebuffer.googlecode.com/files/PyGTKCodeBuffer-0.3.4.tar.bz2',
         
         classifiers = ['Development Status :: 4 - Beta',
                        'Environment :: X11 Applications :: GTK',
