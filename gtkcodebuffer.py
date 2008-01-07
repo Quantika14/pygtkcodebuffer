@@ -106,11 +106,7 @@ class Pattern:
         
     def __call__(self, txt, start, end):
         m = self._regexp.search(txt)
-        if DEBUG_FLAG:
-            print "Search for %s at %s..."%(self._regexp.pattern, start.get_offset())
         if not m: return None
-        if DEBUG_FLAG:
-            print "... found \"%s\" (%s)"%(m.group(self._group), self.tag_name)
         
         mstart, mend = m.start(self._group), m.end(self._group)
         s = start.copy(); s.forward_chars(mstart)
@@ -144,23 +140,15 @@ class String:
 
 
     def __call__(self, txt, start, end):
-        if DEBUG_FLAG:
-            print "Search string (%s) at %i..."%(self._starts.pattern,start.get_offset())
-        
         start_match = self._starts.search(txt)
         if not start_match: return
         
-        if DEBUG_FLAG:
-            print "... found string start at %s"%(start_match.start(0))
-            
         start_it = start.copy()
         start_it.forward_chars(start_match.start(0))
         end_it   = end.copy()
         
         end_match = self._ends.search(txt, start_match.end(0)-1)
         if end_match:
-            if DEBUG_FLAG:
-                print "... found string and at %s"%(end_match.end(0))
             end_it.set_offset(start.get_offset()+end_match.end(0))            
             
         return  start_it, end_it
@@ -176,9 +164,6 @@ class LanguageDefinition:
         # if no end given -> end of buffer
         if not end: end = buf.get_end_iter()
     
-        if DEBUG_FLAG:
-            print "Apply lang-rules at %s..."%(start.get_offset())
-            
         mstart = mend = end
         mtag   = None
         txt = buf.get_slice(start, end)    
@@ -210,8 +195,6 @@ class SyntaxLoader(ContentHandler, LanguageDefinition):
         LanguageDefinition.__init__(self, [])
         ContentHandler.__init__(self)
        
-        if DEBUG_FLAG:
-            print SYNTAX_PATH 
         # search for syntax-files:
         fname = None
         for syntax_dir in SYNTAX_PATH:
@@ -365,7 +348,10 @@ class CodeBuffer(gtk.TextBuffer):
             self.emit_stop_by_name('apply-tag')
             return True
             
-                        
+        if DEBUG_FLAG:    
+            print "tag \"%s\" as %s"%(self.get_slice(start,end), tag.get_property("name"))
+            
+                            
     def _on_insert_text(self, buf, it, text, length):
         # if no syntax defined -> nop
         if not self._lang_def: return False
@@ -402,6 +388,9 @@ class CodeBuffer(gtk.TextBuffer):
         
     
     def update_syntax(self, start, end=None):
+        if DEBUG_FLAG:
+            print "Update syntax from %i"%start.get_offset()
+            
         # if not end defined
         if not end: end = self.get_end_iter()
         
@@ -413,14 +402,17 @@ class CodeBuffer(gtk.TextBuffer):
         if tagname:     #if something found
             tag = self.get_tag_table().lookup(tagname)
             if mstart.begins_tag(tag) and mend.ends_tag(tag) and not mstart.equal(start):
+                self.remove_all_tags(start,mstart)
+                self.apply_tag_by_name("DEFAULT", start, mstart)
                 if DEBUG_FLAG:
-                    print "Optimized: Found tag at %i (%s)"%(mstart.get_offset(), mstart.get_char())
+                    print "Optimized: Found old tag at %i (%s)"%(mstart.get_offset(), mstart.get_char())
                 return
                 
         # remove all tags from start..mend (mend == buffer-end if no match)        
         self.remove_all_tags(start, mend)
         # make start..mstart = DEFAUL (mstart == buffer-end if no match)
-        self.apply_tag_by_name("DEFAULT", start, mstart)                
+        if not start.equal(mstart):
+            self.apply_tag_by_name("DEFAULT", start, mstart)                
         
         # nothing found -> finished
         if not tagname: 
