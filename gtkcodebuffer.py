@@ -359,6 +359,7 @@ class CodeBuffer(gtk.TextBuffer):
         # if no syntax defined -> nop
         if not self._lang_def: return False
 
+        it = it.copy()
         it.backward_chars(length)
         
         if not it.begins_tag():
@@ -374,6 +375,7 @@ class CodeBuffer(gtk.TextBuffer):
         # if no syntax defined -> nop
         if not self._lang_def: return False
 
+        start = start.copy()
         if not start.begins_tag():
             start.backward_to_tag_toggle(None)
                     
