@@ -1,52 +1,78 @@
 <?xml version="1.0"?>
 
 <syntax>
+    <!-- NEW style definitions... -->
+    <!-- even overwrites default styles like "DEFAULT" -->
+    <style name="DEFAULT">  
+        <property name="font">Sans</property>
+    </style>
+    
+    <style name="emphasis1">
+        <property name="font">Sans Italic</property>
+    </style>
+    
+    <style name="emphasis2">
+        <property name="weight">heavy</property>
+    </style>
 
+    <style name="link">
+        <property name="foreground">#0000FF</property>
+        <property name="underline">single</property>
+    </style>
+    
+    
+    <!-- strong emphasis -->
+    <string style="emphasis2">
+        <starts>\s\*\*\S</starts>
+        <ends>\S\*\*</ends>
+    </string>
+    <string style="emphasis2">
+        <starts>\s\_\_\S</starts>
+        <ends>\S\_\_</ends>
+    </string>
+        
     <!-- emphasis -->
-    <string style="datatype">
-        <starts>\*\S</starts>
+    <string style="emphasis1">
+        <starts>\s\*\S</starts>
         <ends>\S\*</ends>
     </string>
-    <string style="datatype">
+    <string style="emphasis1">
         <starts>\s\_\S</starts>
         <ends>\S\_</ends>
     </string>
-    <!-- single underscore may be buggy -->
 
-    <!-- strong emphasis -->
-    <string style="datatype">
-        <starts>\*\*\S</starts>
-        <ends>\S\*\*</ends>
-    </string>
-    <string style="datatype">
-        <starts>\_\_\S</starts>
-        <ends>\S\_\_</ends>
-    </string>
 
     <!-- URLs (note the gt and lt signs are ampersand quoted) -->
-    <string style="datatype">
+    <string style="link">
         <starts>\&lt;</starts>
         <ends>\&gt;</ends>
     </string>
-
+    
+    <string style="link">
+        <starts>\[</starts>
+        <ends>\]</ends>
+    </string>
+    
     <!-- code -->
     <string style="special">
         <starts>`</starts>
         <ends>`</ends>
     </string> 
-    <pattern style="special">^\ \ \ \ .+$</pattern>
-    <pattern style="special">^\t.+$</pattern>
+    <pattern style="special">^\n(\ \ \ \ .+\n)+$</pattern>
+    <pattern style="special">^\n(\t.+\n)+$</pattern>
 
-    <!-- block quote (should the gt signs be ampersand quoted? Breaks if it is...) -->
+    <!-- block quote -->
     <pattern style="special">^\&gt;.+$</pattern>
 
     <!-- headings -->
     <pattern style="keyword">^#+.+$</pattern>
+    <pattern style="keyword">^.+\n=+$</pattern>
+    <pattern style="keyword">^.+\n-+$</pattern>
 
     <!-- lists -->
-    <pattern style="comment" group="1">^(\+ ).+$</pattern>
-    <pattern style="comment" group="1">^(\* ).+$</pattern>
-    <pattern style="comment" group="1">^(- ).+$</pattern>
-    <pattern style="comment" group="1">^(\d+\. ).+$</pattern>
+    <pattern style="comment" group="1">^\s*(\+ ).+$</pattern>
+    <pattern style="comment" group="1">^\s*(\* ).+$</pattern>
+    <pattern style="comment" group="1">^\s*(- ).+$</pattern>
+    <pattern style="comment" group="1">^\s*(\d+\. ).+$</pattern>
 
 </syntax>

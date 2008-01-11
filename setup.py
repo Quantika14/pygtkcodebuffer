@@ -5,7 +5,8 @@ from distutils.core import setup
 import os.path
 import glob 
 
-syntax_files = glob.glob(os.path.join("syntax","*.xml"))
+loc_dir      = os.path.dirname(__file__)
+syntax_files = glob.glob(os.path.join(loc_dir, "syntax","*.xml"))
 
 desc = """PyGTKCodeBuffer - Lightweight syntax-highlighting for PyGTK's TextView-widget."""
 
@@ -15,7 +16,7 @@ standard library. No Gnome nor Scintilla libraries are needed so it should run
 perfectly under all platforms supported by PyGTK!"""
 
 setup ( name = 'PyGTKCodeBuffer',
-        version = '0.3.4',
+        version = '0.3.5',
         description = desc,
         long_description = long_desc,
         author = 'Hannes Matuschek',

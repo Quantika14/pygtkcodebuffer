@@ -18,6 +18,7 @@
 
 
 import gtk
+import pango
 import re
 import sys
 import os.path
@@ -33,15 +34,20 @@ DEFAULT_STYLES = {
     'comment':      {'foreground': '#0000FF'},
     'preprocessor': {'foreground': '#A020F0'},
     'keyword':      {'foreground': '#A52A2A',
-                     'weight': 700},
+                     'weight': pango.WEIGHT_BOLD},
     'special':      {'foreground': 'turquoise'},
     'mark1':        {'foreground': '#008B8B'},
     'mark2':        {'foreground': '#6A5ACD'},
     'string':       {'foreground': '#FF00FF'},
     'number':       {'foreground': '#FF00FF'},
     'datatype':     {'foreground': '#2E8B57',
-                     'weight': 700},
-    'function':     {'foreground': '#008A8C'} }
+                     'weight': pango.WEIGHT_BOLD},
+    'function':     {'foreground': '#008A8C'},
+
+    'link':         {'foreground': '#0000FF',
+                     'underline': pango.UNDERLINE_SINGLE}}
+
+
         
 
 
@@ -65,6 +71,27 @@ SYNTAX_PATH = [ os.path.join('.', 'syntax'),
 
 DEBUG_FLAG  = False
 
+
+#
+# Some log functions...
+#   (internal used)
+def _log_debug(msg):
+    if not DEBUG_FLAG:
+        return
+    sys.stderr.write("DEBUG: ")
+    sys.stderr.write(msg)
+    sys.stderr.write("\n")
+    
+def _log_warn(msg):
+    sys.stderr.write("WARN: ")
+    sys.stderr.write(msg)
+    sys.stderr.write("\n")
+        
+def _log_error(msg):
+    sys.stderr.write("ERROR: ")
+    sys.stderr.write(msg)
+    sys.stderr.write("\n")
+        
 
 
 
@@ -159,7 +186,8 @@ class String:
 class LanguageDefinition:
     def __init__(self, rules):
         self._grammar = rules
-        
+        self._styles = dict()
+                
     def __call__(self, buf, start, end=None):
         # if no end given -> end of buffer
         if not end: end = buf.get_end_iter()
@@ -188,24 +216,44 @@ class LanguageDefinition:
         return (mstart, mend, mtag)                
 
 
+    def get_styles(self):
+        return self._styles
+        
+
 
 
 class SyntaxLoader(ContentHandler, LanguageDefinition):
+    # some translation-tables for the style-defs:
+    style_weight_table =    {'ultralight': pango.WEIGHT_ULTRALIGHT,
+                             'light': pango.WEIGHT_LIGHT,
+                             'normal': pango.WEIGHT_NORMAL,
+                             'bold':   pango.WEIGHT_BOLD,
+                             'ultrabold': pango.WEIGHT_ULTRABOLD,
+                             'heavy': pango.WEIGHT_HEAVY}
+    style_variant_table =   {'normal': pango.VARIANT_NORMAL,
+                             'smallcaps': pango.VARIANT_SMALL_CAPS}
+    style_underline_table = {'none': pango.UNDERLINE_NONE,
+                             'single': pango.UNDERLINE_SINGLE,
+                             'double': pango.UNDERLINE_DOUBLE}
+    style_style_table =     {'normal': pango.STYLE_NORMAL,
+                             'oblique': pango.STYLE_OBLIQUE,
+                             'italic': pango.STYLE_ITALIC}                                                   
+                          
+                          
     def __init__(self, lang_name):
         LanguageDefinition.__init__(self, [])
         ContentHandler.__init__(self)
-       
+
         # search for syntax-files:
         fname = None
         for syntax_dir in SYNTAX_PATH:
             fname = os.path.join(syntax_dir, "%s.xml"%lang_name)
             if os.path.isfile(fname): break
 
-        if DEBUG_FLAG:
-            print "Loading syntaxfile %s"%fname
+        _log_debug("Loading syntaxfile %s"%fname)
 
         xml.sax.parse(fname, self)
-      
+        
         
     # Dispatch start/end - document/element and chars        
     def startDocument(self):
@@ -313,8 +361,55 @@ class SyntaxLoader(ContentHandler, LanguageDefinition):
         self.__end_pattern += unescape(txt)
 
 
+    # handle style
+    def start_style(self, attr):
+        self.__style_props = dict()
+        self.__style_name = attr['name']
+        
+    def end_style(self):
+        self._styles[self.__style_name] = self.__style_props
+        del self.__style_props
+        del self.__style_name
+        
+    def start_property(self, attr):
+        self.__style_prop_name = attr['name']
+        
+    def chars_property(self, value):
+        value.strip()
+        
+        # convert value
+        if self.__style_prop_name in ['font','foreground','background',]:
+            pass
+            
+        elif self.__style_prop_name == 'variant':
+            try: value = self.style_variant_table[value]
+            except:
+                Exception("Unknown style-variant: %s"%value)
+                
+        elif self.__style_prop_name == 'underline':
+            try: value = self.style_underline_table[value]
+            except:
+                Exception("Unknown underline-style: %s"%value)
+                
+        elif self.__style_prop_name == 'weight':
+            try: value = self.style_weight_table[value]
+            except:
+                Exception("Unknown style-weight: %s"%value)
+                
+        elif self.__style_prop_name == 'style':
+            try: value = self.style_style_table[value]
+            except:
+                Exception("Unknwon text-style: %s"%value)        
+                
+        else:
+            raise Exception("Unknown style-property %s"%self.__style_prop_name)
 
-
+        # store value            
+        self.__style_props[self.__style_prop_name] = value
+            
+            
+            
+            
 class CodeBuffer(gtk.TextBuffer):
     def __init__(self, table=None, lang=None, styles={}):
         gtk.TextBuffer.__init__(self, table)
@@ -322,7 +417,9 @@ class CodeBuffer(gtk.TextBuffer):
         # default styles    
         self.styles = DEFAULT_STYLES
                        
-        # update with user-defined
+        # update styles with lang-spec:
+        self.styles.update(lang.get_styles())               
+        # update styles with user-defined
         self.styles.update(styles)
         
         # create tags

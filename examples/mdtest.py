@@ -1,6 +1,14 @@
 #!/usr/bin/python
 import gtk
+
+# not needed if you have codebuffer installed:
+import sys
+sys.path.insert(0, "..")
+
 from gtkcodebuffer import CodeBuffer, SyntaxLoader, add_syntax_path
+
+# also not needed if installed:
+add_syntax_path("../syntax/")
 
 
 txt = """
@@ -30,8 +38,8 @@ and <http://daringfireball.net/projects/markdown/>
 + an other style
 * yet other list/bullet style
 
-1. A ordered list
-2. other item
+  1. A ordered list
+  2. other item
 
 #### n-th order heading
 
@@ -52,6 +60,14 @@ Next is quoting (indentation):
 > as is this.
 
 
+Underline headings
+==================
+And Underline headings
+----------------------
+are supported since version 0.3.5
+also this [link] type
+
+
 ## TODO and Unsupported Markup
 
 TODO! I've overloaded some of the styles/colours in the XML file,
@@ -60,16 +76,9 @@ e.g. URLs are datatypes (like emphasis).
 Currently does not handle:
 
 *   Horizontal Rules/Lines
-*   Square bracket "[]" style links/urls
-*   lists that have multiple lines and the extra lines
-    are indented (appear as code). E.g. this line :-)
-*   lists with leading spaces (it should).
-*   Underlined header.
-*   br line breaks (not sure it makes sense to do so)
 
 """
 
-add_syntax_path("../syntax/")
 
 lang = SyntaxLoader("markdown")
 buff = CodeBuffer(lang=lang)
