@@ -114,8 +114,9 @@ class Pattern:
     def __init__(self, regexp, style="DEFAULT", group=0, flags=""):
         # assemble re-flag
         flags += "ML"; flag   = 0
-        if DEBUG_FLAG: 
-            print "init rule %s -> %s (%s)"%(regexp, style, flags)
+        
+        _log_debug("init rule %s -> %s (%s)"%(regexp, style, flags))
+        
         for char in flags:
             if char == 'M': flag |= re.M
             if char == 'L': flag |= re.L
@@ -445,8 +446,7 @@ class CodeBuffer(gtk.TextBuffer):
             self.emit_stop_by_name('apply-tag')
             return True
             
-        if DEBUG_FLAG:    
-            print "tag \"%s\" as %s"%(self.get_slice(start,end), tag.get_property("name"))
+        _log_debug("tag \"%s\" as %s"%(self.get_slice(start,end), tag.get_property("name")))
             
                             
     def _on_insert_text(self, buf, it, text, length):
@@ -458,13 +458,11 @@ class CodeBuffer(gtk.TextBuffer):
         
         if not it.begins_tag():
             it.backward_to_tag_toggle(None)
-            if DEBUG_FLAG:
-                print "Not tag-start -> moved iter to %i (%s)"%(it.get_offset(), it.get_char()) 
+            _log_debug("Not tag-start -> moved iter to %i (%s)"%(it.get_offset(), it.get_char()))
 
         if it.begins_tag(self.get_tag_table().lookup("DEFAULT")):
             it.backward_to_tag_toggle(None)
-            if DEBUG_FLAG:
-                print "Iter at DEFAULT-start -> moved to %i (%s)"%(it.get_offset(), it.get_char())
+            _log_debug("Iter at DEFAULT-start -> moved to %i (%s)"%(it.get_offset(), it.get_char()))
             
         self._apply_tags = True    
         self.update_syntax(it)        
@@ -485,8 +483,7 @@ class CodeBuffer(gtk.TextBuffer):
         
     
     def update_syntax(self, start, end=None):
-        if DEBUG_FLAG:
-            print "Update syntax from %i"%start.get_offset()
+        _log_debug("Update syntax from %i"%start.get_offset())
             
         # if not end defined
         if not end: end = self.get_end_iter()
@@ -501,8 +498,7 @@ class CodeBuffer(gtk.TextBuffer):
             if mstart.begins_tag(tag) and mend.ends_tag(tag) and not mstart.equal(start):
                 self.remove_all_tags(start,mstart)
                 self.apply_tag_by_name("DEFAULT", start, mstart)
-                if DEBUG_FLAG:
-                    print "Optimized: Found old tag at %i (%s)"%(mstart.get_offset(), mstart.get_char())
+                _log_debug("Optimized: Found old tag at %i (%s)"%(mstart.get_offset(), mstart.get_char()))
                 return
                 
         # remove all tags from start..mend (mend == buffer-end if no match)        
