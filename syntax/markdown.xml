@@ -19,7 +19,32 @@
         <property name="foreground">#0000FF</property>
         <property name="underline">single</property>
     </style>
+
+    <style name="code">
+        <property name="foreground">blue</property>
+    </style>
     
+    <style name="quoted_text">
+        <property name="foreground">brown</property>
+    </style>
+    
+    <!-- only have 1 heading style name at this time -->
+    <style name="heading">
+        <property name="foreground">dark green</property>
+        <property name="scale">xx_large</property>
+    </style>
+    
+    <style name="bullet_list">
+        <property name="font">monospace</property>
+        <property name="foreground">magenta</property>
+    </style>
+    
+    <style name="numbered_list">
+        <property name="font">monospace</property>
+        <property name="foreground">magenta</property>
+    </style>
+    
+    <!-- normal syntax definitions -->
     
     <!-- strong emphasis -->
     <string style="emphasis2">
@@ -41,7 +66,6 @@
         <ends>\S\_</ends>
     </string>
 
-
     <!-- URLs (note the gt and lt signs are ampersand quoted) -->
     <string style="link">
         <starts>\&lt;</starts>
@@ -54,25 +78,27 @@
     </string>
     
     <!-- code -->
-    <string style="special">
+    <string style="code">
         <starts>`</starts>
         <ends>`</ends>
     </string> 
-    <pattern style="special">^\n(\ \ \ \ .+\n)+$</pattern>
-    <pattern style="special">^\n(\t.+\n)+$</pattern>
+    <pattern style="code">^\n(\ \ \ \ .+\n)+$</pattern>
+    <pattern style="code">^\n(\t.+\n)+$</pattern>
 
     <!-- block quote -->
-    <pattern style="special">^\&gt;.+$</pattern>
+    <pattern style="quoted_text">^\&gt;.+$</pattern>
 
     <!-- headings -->
-    <pattern style="keyword">^#+.+$</pattern>
-    <pattern style="keyword">^.+\n=+$</pattern>
-    <pattern style="keyword">^.+\n-+$</pattern>
+    <pattern style="heading">^#+.+$</pattern>
+    <pattern style="heading">^.+\n=+$</pattern>
+    <pattern style="heading">^.+\n-+$</pattern>
 
     <!-- lists -->
-    <pattern style="comment" group="1">^\s*(\+ ).+$</pattern>
-    <pattern style="comment" group="1">^\s*(\* ).+$</pattern>
-    <pattern style="comment" group="1">^\s*(- ).+$</pattern>
-    <pattern style="comment" group="1">^\s*(\d+\. ).+$</pattern>
+    <!-- bullet lists -->
+        <pattern style="bullet_list" group="1">^\s*(\+ ).+$</pattern>
+        <pattern style="bullet_list" group="1">^\s*(\* ).+$</pattern>
+        <pattern style="bullet_list" group="1">^\s*(- ).+$</pattern>
+    <!-- numbered lists -->
+        <pattern style="numbered_list" group="1">^\s*(\d+\. ).+$</pattern>
 
 </syntax>

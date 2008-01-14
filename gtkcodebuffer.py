@@ -124,10 +124,12 @@ class Pattern:
             if char == 'I': flag |= re.I
             if char == 'U': flag |= re.U
             if char == 'X': flag |= re.X
+
         # compile re        
         try: self._regexp = re.compile(regexp, flag)
         except re.error, e: 
             raise Exception("Invalid regexp \"%s\": %s"%(regexp,str(e)))
+
         self._group  = group
         self.tag_name = style
         
@@ -162,8 +164,12 @@ class String:
             end_exp = end_exp%{'esc':escape*2,'end':ends}
         else:
             end_exp = ends
-            
-        self._ends    = re.compile(end_exp)
+
+        try:     
+            self._ends    = re.compile(end_exp)
+        except re.error, e: 
+            raise Exception("Invalid regexp \"%s\": %s"%(regexp,str(e)))
+
         self.tag_name = style
 
 
@@ -239,7 +245,15 @@ class SyntaxLoader(ContentHandler, LanguageDefinition):
     style_style_table =     {'normal': pango.STYLE_NORMAL,
                              'oblique': pango.STYLE_OBLIQUE,
                              'italic': pango.STYLE_ITALIC}                                                   
-                          
+    style_scale_table =     {
+                            'xx_small': pango.SCALE_XX_SMALL,
+                            'x_small':  pango.SCALE_X_SMALL,
+                            'small':  pango.SCALE_SMALL,
+                            'medium':  pango.SCALE_MEDIUM,
+                            'large':  pango.SCALE_LARGE,
+                            'x_large':  pango.SCALE_X_LARGE,
+                            'xx_large': pango.SCALE_XX_LARGE,
+                            }
                           
     def __init__(self, lang_name):
         LanguageDefinition.__init__(self, [])
@@ -252,7 +266,10 @@ class SyntaxLoader(ContentHandler, LanguageDefinition):
             if os.path.isfile(fname): break
 
         _log_debug("Loading syntaxfile %s"%fname)
-
+        
+        if not os.path.isfile(fname):
+            raise Exception("No snytax-file for %s found!"%lang_name)
+            
         xml.sax.parse(fname, self)
         
         
@@ -383,24 +400,29 @@ class SyntaxLoader(ContentHandler, LanguageDefinition):
             pass
             
         elif self.__style_prop_name == 'variant':
-            try: value = self.style_variant_table[value]
-            except:
+            if not value in self.style_variant_table.keys():
                 Exception("Unknown style-variant: %s"%value)
+            value = self.style_variant_table[value]
                 
         elif self.__style_prop_name == 'underline':
-            try: value = self.style_underline_table[value]
-            except:
+            if not value in self.style_underline_table.keys():
                 Exception("Unknown underline-style: %s"%value)
+            value = self.style_underline_table[value]
                 
+        elif self.__style_prop_name == 'scale':
+            if not value in self.style_scale_table.keys():
+                Exception("Unknown scale-style: %s"%value)
+            value = self.style_scale_table[value]
+
         elif self.__style_prop_name == 'weight':
-            try: value = self.style_weight_table[value]
-            except:
+            if not value in self.style_weight_table.keys():
                 Exception("Unknown style-weight: %s"%value)
+            value = self.style_weight_table[value]
                 
         elif self.__style_prop_name == 'style':
-            try: value = self.style_style_table[value]
-            except:
-                Exception("Unknwon text-style: %s"%value)        
+            if not value in self.style_style_table[value]:
+                Exception("Unknwon text-style: %s"%value)
+            value = self.style_style_table[value]
                 
         else:
             raise Exception("Unknown style-property %s"%self.__style_prop_name)
