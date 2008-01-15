@@ -16,7 +16,7 @@ standard library. No Gnome nor Scintilla libraries are needed so it should run
 perfectly under all platforms supported by PyGTK!"""
 
 setup ( name = 'PyGTKCodeBuffer',
-        version = '0.4.0',
+        version = '1.0-RC1',
         description = desc,
         long_description = long_desc,
         author = 'Hannes Matuschek',
