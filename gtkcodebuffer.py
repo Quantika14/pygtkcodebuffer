@@ -1,6 +1,10 @@
 """ This module contains the PyGTKCodeBuffer-class. This class is a 
     specialisation of the gtk.TextBuffer and enables syntax-highlighting for 
-    PyGTK's TextView-widget. """
+    PyGTK's TextView-widget. 
+    
+    To use the syntax-highlighting feature you have load a syntax-definition or
+    specify your own. To load one please read the docs for the SyntaxLoader()
+    class. """
 
 
 # This library is free software: you can redistribute it and/or modify
@@ -28,7 +32,7 @@ from xml.sax.handler import ContentHandler
 from xml.sax.saxutils import unescape
 
 
-
+# defined the default styles
 DEFAULT_STYLES = {
     'DEFAULT':      {'font': 'monospace'},
     'comment':      {'foreground': '#0000FF'},
@@ -51,24 +55,27 @@ DEFAULT_STYLES = {
         
 
 
-def main_is_frozen():
+def _main_is_frozen():
+    """ Internal used function. """
     return (hasattr(sys, "frozen") or # new py2exe
             hasattr(sys, "importers") # old py2exe
             or imp.is_frozen("__main__")) # tools/freeze
 
 
-if main_is_frozen():
+if _main_is_frozen():
     this_module_path = os.path.dirname(sys.executable)
 else:
     this_module_path = os.path.abspath(os.path.dirname(__file__))
 
 
+# defines default-search paths for syntax-files 
 SYNTAX_PATH = [ os.path.join('.', 'syntax'),
                 this_module_path,
                 os.path.join(os.path.expanduser('~'),".pygtkcodebuffer"),
                 os.path.join(sys.prefix,"share","pygtkcodebuffer","syntax")]
          
 
+# enable/disable debug-messages
 DEBUG_FLAG  = False
 
 
@@ -96,22 +103,39 @@ def _log_error(msg):
 
 
 def add_syntax_path(path_or_list):
+    """ This function adds one (string) or many (list of strings) paths to the 
+        global search-paths for syntax-files. """
     global SYNTAX_PATH
+    # handle list of strings
     if isinstance(path_or_list, (list, tuple)):
         for i in range(len(path_or_list)):
             SYNTAX_PATH.insert(0, path_or_list[-i])
+    # handle single string
     elif isinstance(path_or_list, basestring):
         SYNTAX_PATH.insert(0, path_or_list)
+    # handle attr-error
     else:
         raise TypeError, "Argument must be path-string or list of strings"
         
         
         
-
 class Pattern:
-    """ More or less internal used class representing a pattern. """
+    """ More or less internal used class representing a pattern. You may use 
+        this class to "hard-code" your syntax-definition. """
 
     def __init__(self, regexp, style="DEFAULT", group=0, flags=""):
+        """ The constructor takes at least on argument: the regular-expression.
+            
+            The optional kwarg style defines the style applied to the string
+            matched by the regexp. 
+            
+            The kwarg group may be used to define which group of the regular 
+            expression will be used for highlighting (Note: This means that only
+            the selected group will be highlighted but the complete pattern must
+            match!)
+            
+            The optional kwarg flags specifies flags for the regular expression.
+            Look at the Python lib-ref for a list of flags and there meaning."""
         # assemble re-flag
         flags += "ML"; flag   = 0
         
@@ -146,18 +170,44 @@ class Pattern:
     
 
 
-
 class KeywordList(Pattern):
+    """ This class may be used for hard-code a syntax-definition. It specifies 
+        a pattern for a keyword-list. This simplifies the definition of 
+        keyword-lists. """
+
     def __init__(self, keywords, style="keyword", flags=""):
+        """ The constructor takes at least on argument: A list of strings 
+            specifying the keywords to highlight. 
+            
+            The optional kwarg style specifies the style used to highlight these
+            keywords. 
+            
+            The optional kwarg flags specifies the flags for the 
+            (internal generated) regular-expression. """
         regexp = "(?:\W|^)(%s)\W"%("|".join(keywords),)
         Pattern.__init__(self, regexp, style, group=1, flags=flags)
         
         
         
-    
 class String:
+    """ This class may be used to hard-code a syntax-definition. It simplifies 
+        the definition of a "string". A "string" is something that consists of
+        a start-pattern and an end-pattern. The end-pattern may be content of 
+        the string if it is escaped. """
+
     def __init__(self, starts, ends, escape=None, style="string"):
-        self._starts  = re.compile(starts)
+        """ The constructor needs at least two arguments: The start- and 
+            end-pattern. 
+            
+            The optional kwarg escape specifies a escape-sequence escaping the 
+            end-pattern.
+            
+            The optional kwarg style specifies the style used to highlight the
+            string. """
+        try:
+            self._starts  = re.compile(starts)
+        except re.error, e: 
+            raise Exception("Invalid regexp \"%s\": %s"%(regexp,str(e)))
         
         if escape:
             end_exp = "[^%(esc)s](?:%(esc)s%(esc)s)*%(end)s"
@@ -186,14 +236,20 @@ class String:
             end_it.set_offset(start.get_offset()+end_match.end(0))            
             
         return  start_it, end_it
-        
-        
-        
+
+
         
 class LanguageDefinition:
+    """ This class is a container class for all rules (Pattern, KeywordList, 
+        ...) specifying the language. You have to used this class if you like
+        to hard-code your syntax-definition. """
+        
     def __init__(self, rules):
+        """ The constructor takes only one argument: A list of rules (i.e 
+            Pattern, KeywordList and String). """
         self._grammar = rules
         self._styles = dict()
+                
                 
     def __call__(self, buf, start, end=None):
         # if no end given -> end of buffer
@@ -230,6 +286,11 @@ class LanguageDefinition:
 
 
 class SyntaxLoader(ContentHandler, LanguageDefinition):
+    """ This class loads a syntax definition. There have to be a file
+        named LANGUAGENAME.xml in one of the directories specified in the
+        global path-list. You may add a directory using the add_syntax_path()
+        function. """
+    
     # some translation-tables for the style-defs:
     style_weight_table =    {'ultralight': pango.WEIGHT_ULTRALIGHT,
                              'light': pango.WEIGHT_LIGHT,
@@ -255,7 +316,14 @@ class SyntaxLoader(ContentHandler, LanguageDefinition):
                             'xx_large': pango.SCALE_XX_LARGE,
                             }
                           
+                          
     def __init__(self, lang_name):
+        """ The constructor takes only one argument: the language name.
+            The constructor tries to load the syntax-definition from a 
+            syntax-file in one directory of the global path-list. 
+            
+            An instance of this class IS a LanguageDefinition. You can pass it
+            to the constructor of the CodeBuffer class. """
         LanguageDefinition.__init__(self, [])
         ContentHandler.__init__(self)
 
@@ -434,7 +502,23 @@ class SyntaxLoader(ContentHandler, LanguageDefinition):
             
             
 class CodeBuffer(gtk.TextBuffer):
+    """ This class extends the gtk.TextBuffer to support syntax-highlighting. 
+        You can use this class like a normal TextBuffer. """
+        
     def __init__(self, table=None, lang=None, styles={}):
+        """ The constructor takes 3 optional arguments. 
+        
+            table specifies a tag-table associated with the TextBuffer-instance.
+            This argument will be passed directly to the constructor of the 
+            TextBuffer-class. 
+            
+            lang specifies the language-definition. You have to load one using
+            the SyntaxLoader-class or you may hard-code your syntax-definition 
+            using the LanguageDefinition-class. 
+            
+            styles is a dictionary used to extend or overwrite the default styles
+            provided by this module (DEFAULT_STYLE) and any language specific 
+            styles defined by the LanguageDefinition. """
         gtk.TextBuffer.__init__(self, table)
 
         # default styles    
@@ -505,6 +589,8 @@ class CodeBuffer(gtk.TextBuffer):
         
     
     def update_syntax(self, start, end=None):
+        """ More or less internal used method to update the 
+            syntax-highlighting. """
         _log_debug("Update syntax from %i"%start.get_offset())
             
         # if not end defined
@@ -541,6 +627,7 @@ class CodeBuffer(gtk.TextBuffer):
         
         
     def reset_language(self, lang_def):
+        """ Reset the currently used language-definition. """
         # remove all tags from complete text
         start = self.get_start_iter()
         self.remove_all_tags(start, self.get_end_iter())
@@ -551,6 +638,8 @@ class CodeBuffer(gtk.TextBuffer):
         
         
     def update_styles(self, styles):
+        """ Update styles. This method may be used to reset any styles on 
+            runtime. """
         self.styles.update(styles)
         
         table = self.get_tag_table()
