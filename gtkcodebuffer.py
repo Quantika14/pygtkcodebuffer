@@ -592,6 +592,8 @@ class CodeBuffer(gtk.TextBuffer):
     def update_syntax(self, start, end=None):
         """ More or less internal used method to update the 
             syntax-highlighting. """
+        # if no lang set    
+        if not self._lang_def: return             
         _log_debug("Update syntax from %i"%start.get_offset())
             
         # if not end defined
@@ -662,4 +664,5 @@ class CodeBuffer(gtk.TextBuffer):
                 tag = table.lookup(name)
                 _log_debug("Update tag %s with (%s)"%(name, style))
                 map(lambda i: tag.set_property(i[0],i[1]), style.items())
-                    
+
+                        
