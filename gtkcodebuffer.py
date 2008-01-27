@@ -76,7 +76,7 @@ SYNTAX_PATH = [ os.path.join('.', 'syntax'),
          
 
 # enable/disable debug-messages
-DEBUG_FLAG  = False
+DEBUG_FLAG  = True
 
 
 #
@@ -525,7 +525,8 @@ class CodeBuffer(gtk.TextBuffer):
         self.styles = DEFAULT_STYLES
                        
         # update styles with lang-spec:
-        self.styles.update(lang.get_styles())               
+        if lang:
+            self.styles.update(lang.get_styles())               
         # update styles with user-defined
         self.styles.update(styles)
         
@@ -613,6 +614,7 @@ class CodeBuffer(gtk.TextBuffer):
         self.remove_all_tags(start, mend)
         # make start..mstart = DEFAUL (mstart == buffer-end if no match)
         if not start.equal(mstart):
+            _log_debug("Apply DEFAULT")
             self.apply_tag_by_name("DEFAULT", start, mstart)                
         
         # nothing found -> finished
@@ -620,6 +622,7 @@ class CodeBuffer(gtk.TextBuffer):
             return
         
         # apply tag
+        _log_debug("Apply %s"%tagname)
         self.apply_tag_by_name(tagname, mstart, mend)
         
         # continue at mend
@@ -633,8 +636,13 @@ class CodeBuffer(gtk.TextBuffer):
         self.remove_all_tags(start, self.get_end_iter())
         # store lexer
         self._lang_def = lang_def
+        # update styles from lang_def:
+        if self._lang_def:
+            self.update_styles(self._lang_def.get_styles())
         # and ...
+        self._apply_tags = True
         self.update_syntax(start)
+        self._apply_tags = False
         
         
     def update_styles(self, styles):
@@ -644,12 +652,14 @@ class CodeBuffer(gtk.TextBuffer):
         
         table = self.get_tag_table()
         for name, props in styles.items():
-            style = dict(DEFAULT_STYLES['DEFAULT'])
+            style = self.styles['DEFAULT']
             style.update(props)
             # if tagname is unknown:
             if not table.lookup(name):
+                _log_debug("Create tag: %s (%s)"%(name, style))
                 self.create_tag(name, **style) 
             else: # update tag
                 tag = table.lookup(name)
-                map(lambda k,v: tag.set_property(k,v), style.items())
+                _log_debug("Update tag %s with (%s)"%(name, style))
+                map(lambda i: tag.set_property(i[0],i[1]), style.items())
                     
