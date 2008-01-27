@@ -599,37 +599,46 @@ class CodeBuffer(gtk.TextBuffer):
         # if not end defined
         if not end: end = self.get_end_iter()
         
-        # search first rule matching txt[start..end]            
-        mstart, mend, tagname = self._lang_def(self, start, end)
+        # We do not used recursion -> long files exceed rec-limit!
+        finished = False
+        while not finished: 
+            # search first rule matching txt[start..end]            
+            mstart, mend, tagname = self._lang_def(self, start, end)
+
+            # optimisation: if mstart-mend is allready tagged with tagname 
+            #   -> finished
+            if tagname:     #if something found
+                tag = self.get_tag_table().lookup(tagname)
+                if mstart.begins_tag(tag) and mend.ends_tag(tag) and not mstart.equal(start):
+                    self.remove_all_tags(start,mstart)
+                    self.apply_tag_by_name("DEFAULT", start, mstart)
+                    _log_debug("Optimized: Found old tag at %i (%s)"%(mstart.get_offset(), mstart.get_char()))
+                    # finish
+                    finished = True
+                    continue
+                    
+            # remove all tags from start..mend (mend == buffer-end if no match)        
+            self.remove_all_tags(start, mend)
+            # make start..mstart = DEFAUL (mstart == buffer-end if no match)
+            if not start.equal(mstart):
+                _log_debug("Apply DEFAULT")
+                self.apply_tag_by_name("DEFAULT", start, mstart)                
         
-        # optimisation: if mstart-mend is allready tagged with tagname 
-        #   -> finished
-        if tagname:     #if something found
-            tag = self.get_tag_table().lookup(tagname)
-            if mstart.begins_tag(tag) and mend.ends_tag(tag) and not mstart.equal(start):
-                self.remove_all_tags(start,mstart)
-                self.apply_tag_by_name("DEFAULT", start, mstart)
-                _log_debug("Optimized: Found old tag at %i (%s)"%(mstart.get_offset(), mstart.get_char()))
-                return
+            # nothing found -> finished
+            if not tagname: 
+                finished = True
+                continue
+        
+            # apply tag
+            _log_debug("Apply %s"%tagname)
+            self.apply_tag_by_name(tagname, mstart, mend)
+
+            start = mend
+            
+            if start == end: 
+                finished = True                 
+                continue
                 
-        # remove all tags from start..mend (mend == buffer-end if no match)        
-        self.remove_all_tags(start, mend)
-        # make start..mstart = DEFAUL (mstart == buffer-end if no match)
-        if not start.equal(mstart):
-            _log_debug("Apply DEFAULT")
-            self.apply_tag_by_name("DEFAULT", start, mstart)                
-        
-        # nothing found -> finished
-        if not tagname: 
-            return
-        
-        # apply tag
-        _log_debug("Apply %s"%tagname)
-        self.apply_tag_by_name(tagname, mstart, mend)
-        
-        # continue at mend
-        self.update_syntax(mend, end)
-        
         
     def reset_language(self, lang_def):
         """ Reset the currently used language-definition. """
