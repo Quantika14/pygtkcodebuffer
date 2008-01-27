@@ -646,7 +646,7 @@ class CodeBuffer(gtk.TextBuffer):
         
         
     def update_styles(self, styles):
-        """ Update styles. This method may be used to reset any styles on 
+        """ Update styles. This method may be used to reset any styles at
             runtime. """
         self.styles.update(styles)
         
