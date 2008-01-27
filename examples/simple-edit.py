@@ -75,5 +75,4 @@ class Editor:
             
 if __name__ == '__main__':
     edit = Editor()
-    
     gtk.main()        

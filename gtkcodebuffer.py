@@ -31,6 +31,9 @@ import imp
 from xml.sax.handler import ContentHandler
 from xml.sax.saxutils import unescape
 
+__version__ = "1.0RC2"
+__author__  = "Hannes Matuschek <hmatuschek@gmail.com>"
+
 
 # defined the default styles
 DEFAULT_STYLES = {
@@ -76,7 +79,7 @@ SYNTAX_PATH = [ os.path.join('.', 'syntax'),
          
 
 # enable/disable debug-messages
-DEBUG_FLAG  = True
+DEBUG_FLAG  = False
 
 
 #
@@ -599,7 +602,7 @@ class CodeBuffer(gtk.TextBuffer):
         # if not end defined
         if not end: end = self.get_end_iter()
         
-        # We do not used recursion -> long files exceed rec-limit!
+        # We do not use recursion -> long files exceed rec-limit!
         finished = False
         while not finished: 
             # search first rule matching txt[start..end]            
