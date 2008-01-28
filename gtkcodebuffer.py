@@ -31,6 +31,9 @@ import imp
 from xml.sax.handler import ContentHandler
 from xml.sax.saxutils import unescape
 
+__version__ = "1.0RC3"
+__author__  = "Hannes Matuschek <hmatuschek@gmail.com>"
+
 
 # defined the default styles
 DEFAULT_STYLES = {
@@ -249,7 +252,11 @@ class LanguageDefinition:
             Pattern, KeywordList and String). """
         self._grammar = rules
         self._styles = dict()
-                
+        self._match_cache = list()
+        self._rules_to_apply = list(self._grammar)
+        self._cached_text = None
+        self._text_slice = None
+        
                 
     def __call__(self, buf, start, end=None):
         # if no end given -> end of buffer
@@ -257,28 +264,90 @@ class LanguageDefinition:
     
         mstart = mend = end
         mtag   = None
-        txt = buf.get_slice(start, end)    
-        
-        # search min match
-        for rule in self._grammar:
-            # search pattern
-            m = rule(txt, start, end)            
-            if not m: continue
-            
-            # prefer match with smallest start-iter 
-            if m[0].compare(mstart) < 0:
-                mstart, mend = m
-                mtag = rule.tag_name
-                continue
-            
-            if m[0].compare(mstart)==0 and m[1].compare(mend)>0:
-                mstart, mend = m
-                mtag = rule.tag_name
-                continue
+        if not self._cached_text or self._text_slice[0]>start.get_offset() or self._text_slice[1]<end.get_offset():
+            self._cached_text = buf.get_slice(start, end)
+            self._text_slice = start.get_offset(), end.get_offset()
+        else:
+            lidx = start.get_offset()-self._text_slice[0]
+            ridx = self._text_slice[1]-end.get_offset()
+            self._cached_text = self._cached_text[lidx:-ridx]
 
+        
+        # search matches
+        next_time_rules = list()
+        for rule in self._rules_to_apply:
+            # search pattern
+            m = rule(self._cached_text, start, end)            
+            if not m: 
+                next_time_rules.append(rule)
+                continue
+            
+            self._insort_match((m[0],m[1],rule))
+            _log_debug("Found %s -> remove from todo-list"%rule.tag_name)
+
+        self._rules_to_apply = next_time_rules
+
+        # if something was found:            
+        if len(self._match_cache)>0:
+            # get first match
+            mstart, mend, rule = self._match_cache.pop(0)
+            self._rules_to_apply.append(rule)            
+            mtag = rule.tag_name
+            _log_debug("pop first match: %s -> append to todo-list"%mtag)
+            # remove all matches that intersects with first match
+            for item in self._match_cache:
+                if item[0].in_range(mstart, mend):
+                    self._match_cache.remove(item)
+                    self._rules_to_apply.append(item[2])
+                    _log_debug("Removed match %s from cache..."%item[2])
+                    continue
+                break
+                
         return (mstart, mend, mtag)                
 
 
+    def clear_cache(self):
+        self._match_cache = list()
+        self._rules_to_apply = list(self._grammar)
+        self._cached_text = None
+        self._text_slice  = None
+        
+    
+    def _insort_match(self, match):
+        mstart, mend, rule = match
+        # if no item present in cache: append new one
+        if len(self._match_cache) == 0:
+            self._match_cache.append(match)
+            return
+
+        for i in range(len(self._match_cache)):
+            cstart, cend, crule = self._match_cache[i]
+            #sort by start index
+            if cstart.compare(match[0]) <= 0: 
+                continue
+            #and length
+            if cstart.compare(match[0])==0 and cend.compare(match[1])>=0:
+                continue
+            self._match_cache.insert(i,match)
+            return
+        self._match_cache.append(match)
+            
+            
+    def _clear_intersects(self, start, end):
+        # filter all items that insersects with given slice
+        def filter_func(item):
+            if start.compare(item[0]) <= 0 and end.compare(item[0]) > 0:
+                return False
+            return True
+        # filter inverse of filter_func and not allready in list:
+        filtered_func = lambda x: not filter_func(x)    
+        # add removed rules to "todo" list
+        rem = map(lambda x: x[2], filter(filtered_func, self._match_cache))
+        self._rules_to_apply += rem
+        # remove matches from cache
+        self._match_cache = filter(filter_func, self._match_cache)
+
+            
     def get_styles(self):
         return self._styles
         
@@ -571,7 +640,9 @@ class CodeBuffer(gtk.TextBuffer):
             it.backward_to_tag_toggle(None)
             _log_debug("Iter at DEFAULT-start -> moved to %i (%s)"%(it.get_offset(), it.get_char()))
             
-        self._apply_tags = True    
+        self._apply_tags = True
+        if self._lang_def:
+            self._lang_def.clear_cache()    
         self.update_syntax(it)        
         self._apply_tags = False
         
@@ -584,7 +655,9 @@ class CodeBuffer(gtk.TextBuffer):
         if not start.begins_tag():
             start.backward_to_tag_toggle(None)
     
-        self._apply_tags = True                
+        self._apply_tags = True
+        if self._lang_def:
+            self._lang_def.clear_cache()                
         self.update_syntax(start)        
         self._apply_tags = False
         
@@ -599,7 +672,7 @@ class CodeBuffer(gtk.TextBuffer):
         # if not end defined
         if not end: end = self.get_end_iter()
         
-        # We do not used recursion -> long files exceed rec-limit!
+        # We do not use recursion -> long files exceed rec-limit!
         finished = False
         while not finished: 
             # search first rule matching txt[start..end]            
@@ -652,6 +725,8 @@ class CodeBuffer(gtk.TextBuffer):
             self.update_styles(self._lang_def.get_styles())
         # and ...
         self._apply_tags = True
+        if self._lang_def:
+            self._lang_def.clear_cache()
         self.update_syntax(start)
         self._apply_tags = False
         

@@ -22,7 +22,7 @@ setup ( name = 'PyGTKCodeBuffer',
         author = 'Hannes Matuschek',
         author_email = 'hmatuschek@gmail.com',
         url = 'http://pygtkcodebuffer.googlecode.com',
-        download_url = 'http://pygtkcodebuffer.googlecode.com/files/PyGTKCodeBuffer-1.0-RC1.tar.bz2',
+        download_url = 'http://pygtkcodebuffer.googlecode.com/files/PyGTKCodeBuffer-1.0-RC2.tar.bz2',
         
         classifiers = ['Development Status :: 5 - Production/Stable',
                        'Environment :: X11 Applications :: GTK',
