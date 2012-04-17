@@ -337,7 +337,7 @@ class SyntaxLoader(ContentHandler, LanguageDefinition):
         _log_debug("Loading syntaxfile %s"%fname)
         
         if not os.path.isfile(fname):
-            raise Exception("No snytax-file for %s found!"%lang_name)
+            raise Exception("No syntax-file for %s found!"%lang_name)
             
         xml.sax.parse(fname, self)
         
