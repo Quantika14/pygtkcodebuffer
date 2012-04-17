@@ -72,7 +72,8 @@ else:
 SYNTAX_PATH = [ os.path.join('.', 'syntax'),
                 this_module_path,
                 os.path.join(os.path.expanduser('~'),".pygtkcodebuffer"),
-                os.path.join(sys.prefix,"share","pygtkcodebuffer","syntax")]
+                os.path.join(sys.prefix,"share","pygtkcodebuffer","syntax"),
+                os.path.join(sys.prefix,"local","share","pygtkcodebuffer","syntax")]
          
 
 # enable/disable debug-messages
